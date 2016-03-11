@@ -1,0 +1,42 @@
+{
+  "verticals": [
+    {
+      "id": 1,
+      "title": "Ideas",
+      "order": 1
+    },
+    {
+      "id": 2,
+      "title": "People",
+      "order": 2
+    }
+  ],
+  "horizontals": [
+    {
+      "id": 1,
+      "vertical": 1,
+      "title": "Funny",
+      "order": 1
+    },
+    {
+      "id": 2,
+      "vertical": 1,
+      "title": "Money",
+      "order": 2
+    },
+    {
+      "id": 3,
+      "vertical": 2,
+      "title": "Friends",
+      "order": 1
+    }
+  ],
+  "notes": [
+    {
+      "title": "McDonalds for Vegans",
+      "vertical": 1,
+      "horizontal": 1,
+      "order": 1
+    }
+  ]
+}
