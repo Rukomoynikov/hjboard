@@ -2,15 +2,19 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
 
-import {Grid, Row, Col, ListGroup, ListGroupItem} from 'react-bootstrap';
+import {Grid, Row, Col, ListGroup, ListGroupItem, Glyphicon, ButtonGroup, Button} from 'react-bootstrap';
 import ColorPicker from 'react-color';
+import dragula from 'react-dragula';
 
 import {HorizontalsStore, VerticalsStore, NotesStore} from './flux/stores.jsx';
 import Actions from './flux/actions.jsx';
 
+import Vertical from './components/vertical/index.jsx';
+
 export default class Main extends React.Component {
 	constructor () {
 		super()
+		console.log(Vertical)
 		this.state = {
 			verticals : [],
 			horizontals : [],
@@ -31,6 +35,7 @@ export default class Main extends React.Component {
 
 	render () {
 		var css = require('../styles.css')
+		var dragulacss = require('../../node_modules/react-dragula/dist/dragula.min.css')
 		return (
 			<Grid fluid={true}>
 				<Row className="show-grid">
@@ -43,46 +48,19 @@ export default class Main extends React.Component {
 	renderVerticals () {
 		return this.state.verticals.map(
 			(vertical) => {
+				var horinzontals = this.state.horizontals.filter(
+					horizontal => horizontal.vertical === vertical.id
+				)
+				var notes = this.state.notes.filter(
+					note => note.vertical === vertical.id
+				)
 				return (
-					<Col xs={2} md={2} key={vertical.title} className='vertical'>
-						<h2>{vertical.title}</h2>
-						{this.renderHorizontals(vertical.id)}
-					</Col>
+					<Vertical {...vertical} key={vertical.title} horizontals={horinzontals} notes={notes} />
 				)
 			}
 		)
 	}
 
-	renderHorizontals (verticalID) {
-		return this.state.horizontals.map(
-			(horizontal) => {
-				if (horizontal.vertical === verticalID){
-					return (
-						<Row className="show-grid" key={horizontal.title} className='horizontal'>
-								<h3>{horizontal.title}</h3>
-								{this.renderNotes(horizontal.id, verticalID)}
-						</Row>
-					)
-				}
-			}
-		)
-	}
-
-	renderNotes (horizontalID, verticalID) {
-		return (
-			<ListGroup>
-				{this.state.notes.map(
-					(note) => {
-						if(note.vertical === verticalID && note.horizontal === horizontalID){
-							return (
-								<ListGroupItem key={note.title}>{note.title}</ListGroupItem>
-							)
-						}
-					}
-				)}
-			</ListGroup>
-		)
-	}
 }
 
 ReactDOM.render(<Main />, document.querySelector('#app'))

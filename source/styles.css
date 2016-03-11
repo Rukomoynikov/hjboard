@@ -1,9 +1,17 @@
+#app {
+	padding: 0px 20px;
+}
 .vertical {
-	border-right: 1px solid black;
 	margin-right: 20px;
 }
 
 .horizontal {
 	background: #c7c7c7;
+	margin-bottom: 20px;
+	border-radius: 20px;
+}
+
+.edit-panel {
+	margin-left: 5px;
 }
 
