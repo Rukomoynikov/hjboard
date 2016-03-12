@@ -7,7 +7,15 @@ const Actions = Reflux.createActions([
 
 	'removeVertical',
 	'updateVertical',
-	'createVertical'
+	'createVertical',
+
+	'removeHorizontal',
+	'createHorizontal',
+	'updateHorizontal',
+
+	'removeNote',
+	'createNote',
+	'updateNote'
 ])
 
 export default Actions

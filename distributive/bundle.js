@@ -117,12 +117,19 @@
 				});
 			});
 			_stores.VerticalsStore.listen(function (eventName, data) {
-				console.log(eventName, data);
 				if (eventName === 'updateVerticals') {
 					console.log(data);
 					_this.setState({
 						verticals: data,
 						creatingNew: false
+					});
+				}
+			});
+			_stores.HorizontalsStore.listen(function (eventName, data) {
+				console.log(eventName, data);
+				if (eventName === 'updateHorizontals') {
+					_this.setState({
+						horinzontals: data
 					});
 				}
 			});
@@ -61526,6 +61533,30 @@
 				state.horizontals = JSON.parse(response.text);
 				_this.trigger('getHorizontals', state.horizontals);
 			});
+		},
+		createHorizontal: function createHorizontal(data) {
+			var _this2 = this;
+
+			_api2.default.createHorizontal(data).end(function (err, response) {
+				var newHorizontal = JSON.parse(response.text);
+				state.horizontals.push(newHorizontal);
+				_this2.trigger('updateHorizontals', state.horizontals);
+			});
+		},
+		updateHorizontal: function updateHorizontal(ID, data) {
+			_api2.default.updateHorizontal(ID, data).end(function (err, response) {
+				// console.log(response)
+			});
+		},
+		removeHorizontal: function removeHorizontal(ID) {
+			var _this3 = this;
+
+			_api2.default.removeHorizontal(ID).end(function (err, response) {
+				state.horizontals = state.horizontals.filter(function (horizontal) {
+					return horizontal.id !== ID;
+				});
+				_this3.trigger('updateHorizontals', state.horizontals);
+			});
 		}
 	});
 
@@ -61533,21 +61564,21 @@
 		listenables: [_actions2.default],
 
 		getVerticals: function getVerticals() {
-			var _this2 = this;
+			var _this4 = this;
 
 			_api2.default.getVerticals().end(function (err, response) {
 				state.verticals = JSON.parse(response.text);
-				_this2.trigger('getVerticals', state.verticals);
+				_this4.trigger('getVerticals', state.verticals);
 			});
 		},
 		removeVertical: function removeVertical(ID) {
-			var _this3 = this;
+			var _this5 = this;
 
 			_api2.default.removeVertical(ID).end(function (err, response) {
 				state.verticals = state.verticals.filter(function (vertical) {
 					return vertical.id !== ID;
 				});
-				_this3.trigger('updateVerticals', state.verticals);
+				_this5.trigger('updateVerticals', state.verticals);
 			});
 		},
 		updateVertical: function updateVertical(ID, data) {
@@ -61556,25 +61587,30 @@
 			});
 		},
 		createVertical: function createVertical(data) {
-			var _this4 = this;
+			var _this6 = this;
 
 			_api2.default.createVertical(data).end(function (err, response) {
 				var newVertical = JSON.parse(response.text);
 				state.verticals.push(newVertical);
-				_this4.trigger('updateVerticals', state.verticals);
+				_this6.trigger('updateVerticals', state.verticals);
 			});
-		}
+		},
+		removeHorizontal: function removeHorizontal() {}
 	});
+
+	// 'removeNote',
+	// 'createNote',
+	// 'updateNote'
 
 	var NotesStore = exports.NotesStore = _reflux2.default.createStore({
 		listenables: [_actions2.default],
 
 		getNotes: function getNotes() {
-			var _this5 = this;
+			var _this7 = this;
 
 			_api2.default.getNotes().end(function (err, response) {
 				state.notes = JSON.parse(response.text);
-				_this5.trigger('getNotes', state.notes);
+				_this7.trigger('getNotes', state.notes);
 			});
 		}
 	});
@@ -61595,7 +61631,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var Actions = _reflux2.default.createActions(['getVerticals', 'getHorizontals', 'getNotes', 'removeVertical', 'updateVertical', 'createVertical']);
+	var Actions = _reflux2.default.createActions(['getVerticals', 'getHorizontals', 'getNotes', 'removeVertical', 'updateVertical', 'createVertical', 'removeHorizontal', 'createHorizontal', 'updateHorizontal', 'removeNote', 'createNote', 'updateNote']);
 
 	exports.default = Actions;
 
@@ -61623,8 +61659,16 @@
 		return _superagent2.default.delete('/verticals/' + ID);
 	};
 
+	var removeHorizontal = function removeHorizontal(ID) {
+		return _superagent2.default.delete('/horizontals/' + ID);
+	};
+
 	var updateVertical = function updateVertical(ID, data) {
 		return _superagent2.default.put('/api/verticals/' + ID).send(data).set('Accept', 'application/json');
+	};
+
+	var updateHorizontal = function updateHorizontal(ID, data) {
+		return _superagent2.default.put('/api/horizontals/' + ID).send(data).set('Accept', 'application/json');
 	};
 
 	var getHorizontals = function getHorizontals() {
@@ -61633,6 +61677,10 @@
 
 	var createVertical = function createVertical(data) {
 		return _superagent2.default.post('/verticals/').send(data).set('Accept', 'application/json');
+	};
+
+	var createHorizontal = function createHorizontal(data) {
+		return _superagent2.default.post('/horizontals/').send(data).set('Accept', 'application/json');
 	};
 
 	var getNotes = function getNotes() {
@@ -61645,7 +61693,10 @@
 		getNotes: getNotes,
 		updateVertical: updateVertical,
 		removeVertical: removeVertical,
-		createVertical: createVertical
+		createVertical: createVertical,
+		createHorizontal: createHorizontal,
+		updateHorizontal: updateHorizontal,
+		removeHorizontal: removeHorizontal
 	};
 
 	exports.default = API;
@@ -63191,7 +63242,8 @@
 				horizontals: props.horizontals,
 				notes: props.notes,
 				editiing: false,
-				showModal: false
+				showModal: false,
+				creatingNewHorizontal: false
 			};
 			_this.close = _this.close.bind(_this);
 			_this.open = _this.open.bind(_this);
@@ -63200,6 +63252,13 @@
 		}
 
 		_createClass(Vertical, [{
+			key: 'componentWillReceiveProps',
+			value: function componentWillReceiveProps(newProps) {
+				this.setState({
+					horizontals: newProps.horizontals
+				});
+			}
+		}, {
 			key: 'render',
 			value: function render() {
 				var _this2 = this;
@@ -63255,11 +63314,19 @@
 											return _this2.setState({ showModal: true });
 										} },
 									_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'remove' })
+								),
+								_react2.default.createElement(
+									_reactBootstrap.Button,
+									{ bsSize: 'xsmall', onClick: function onClick(event) {
+											return _actions2.default.createHorizontal({ vertical: _this2.props.id });
+										} },
+									_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'plus-sign' })
 								)
 							)
 						),
 						this.renderModal(),
-						this.renderHorizontals()
+						this.renderHorizontals(),
+						this.renderNewHorizontalForm()
 					);
 				}
 			}
@@ -63312,6 +63379,15 @@
 						)
 					)
 				);
+			}
+		}, {
+			key: 'renderNewHorizontalForm',
+			value: function renderNewHorizontalForm() {
+				if (this.state.creatingNewHorizontal) {
+					return _react2.default.createElement(_index2.default, _extends({ "title": "New one", "id": 0 }, { key: 0, notes: [] }));
+				} else {
+					return null;
+				}
 			}
 		}, {
 			key: 'close',
@@ -63368,6 +63444,10 @@
 
 	var _index2 = _interopRequireDefault(_index);
 
+	var _actions = __webpack_require__(490);
+
+	var _actions2 = _interopRequireDefault(_actions);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -63388,7 +63468,9 @@
 
 			_this.state = {
 				title: props.title,
-				notes: props.notes
+				notes: props.notes,
+				showModal: false,
+				editing: false
 			};
 			return _this;
 		}
@@ -63402,28 +63484,63 @@
 					_react2.default.createElement(
 						_reactBootstrap.Col,
 						{ xs: 12, md: 12 },
-						_react2.default.createElement(
-							'h4',
-							null,
-							this.state.title,
-							_react2.default.createElement(
-								_reactBootstrap.ButtonGroup,
-								{ className: 'edit-panel' },
-								_react2.default.createElement(
-									_reactBootstrap.Button,
-									{ bsSize: 'xsmall' },
-									_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'pencil' })
-								),
-								_react2.default.createElement(
-									_reactBootstrap.Button,
-									{ bsSize: 'xsmall' },
-									_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'remove' })
-								)
-							)
-						),
-						this.renderNotes()
+						this.renderTitle(),
+						this.renderNotes(),
+						this.state.showModal ? this.renderModal() : null
 					)
 				);
+			}
+		}, {
+			key: 'renderTitle',
+			value: function renderTitle() {
+				var _this2 = this;
+
+				if (this.state.editing) {
+					return _react2.default.createElement(
+						'h4',
+						null,
+						_react2.default.createElement('input', {
+							className: 'form-control leftInput',
+							type: 'text',
+							value: this.state.title,
+							ref: 'input',
+							onChange: function onChange(event) {
+								return _this2.setState({ title: event.target.value });
+							}
+						}),
+						_react2.default.createElement(
+							_reactBootstrap.Button,
+							{ bsStyle: 'success', onClick: function onClick(event) {
+									return _this2.updateHorizontal();
+								} },
+							_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'ok' })
+						)
+					);
+				} else {
+					return _react2.default.createElement(
+						'h4',
+						null,
+						this.state.title,
+						_react2.default.createElement(
+							_reactBootstrap.ButtonGroup,
+							{ className: 'edit-panel' },
+							_react2.default.createElement(
+								_reactBootstrap.Button,
+								{ bsSize: 'xsmall', onClick: function onClick(event) {
+										return _this2.setState({ editing: true });
+									} },
+								_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'pencil' })
+							),
+							_react2.default.createElement(
+								_reactBootstrap.Button,
+								{ bsSize: 'xsmall', onClick: function onClick(event) {
+										return _this2.setState({ showModal: true });
+									} },
+								_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'remove' })
+							)
+						)
+					);
+				}
 			}
 		}, {
 			key: 'renderNotes',
@@ -63440,6 +63557,74 @@
 						'Добавить'
 					)
 				);
+			}
+		}, {
+			key: 'renderModal',
+			value: function renderModal() {
+				var _this3 = this;
+
+				return _react2.default.createElement(
+					_reactBootstrap.Modal,
+					{ show: this.state.showModal, onHide: this.close },
+					_react2.default.createElement(
+						_reactBootstrap.Modal.Header,
+						{ closeButton: true },
+						_react2.default.createElement(
+							_reactBootstrap.Modal.Title,
+							null,
+							'Remove  "',
+							this.state.title,
+							'" ? '
+						)
+					),
+					_react2.default.createElement(
+						_reactBootstrap.Modal.Body,
+						null,
+						'All notes included to this vertical will be removed too.'
+					),
+					_react2.default.createElement(
+						_reactBootstrap.Modal.Footer,
+						null,
+						_react2.default.createElement(
+							_reactBootstrap.Button,
+							{ onClick: this.close },
+							'No'
+						),
+						_react2.default.createElement(
+							_reactBootstrap.Button,
+							{ onClick: function onClick(event) {
+									return _this3.removeHorizontal();
+								} },
+							'Yes'
+						)
+					)
+				);
+			}
+		}, {
+			key: 'close',
+			value: function close() {
+				this.setState({ showModal: false });
+			}
+		}, {
+			key: 'open',
+			value: function open() {
+				this.setState({ showModal: true });
+			}
+		}, {
+			key: 'updateHorizontal',
+			value: function updateHorizontal() {
+				this.setState({ editing: false });
+				var newHorizontal = {
+					title: this.state.title,
+					vertical: this.props.vertical
+				};
+				_actions2.default.updateHorizontal(this.props.id, newHorizontal);
+			}
+		}, {
+			key: 'removeHorizontal',
+			value: function removeHorizontal() {
+				this.setState({ showModal: false });
+				_actions2.default.removeHorizontal(this.props.id);
 			}
 		}]);
 

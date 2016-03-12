@@ -17,7 +17,38 @@ export const HorizontalsStore = Reflux.createStore({
 				state.horizontals = JSON.parse(response.text);
 				this.trigger('getHorizontals', state.horizontals)
 			})
+	},
+
+	createHorizontal (data) {
+		API.createHorizontal(data)
+			.end(
+				(err, response) => {
+					var newHorizontal = JSON.parse(response.text);
+					state.horizontals.push(newHorizontal);
+					this.trigger('updateHorizontals', state.horizontals);
+				}
+			)
+	},
+
+	updateHorizontal (ID, data) {
+		API.updateHorizontal(ID, data)
+			.end(
+				(err, response) => {
+					// console.log(response)
+				}
+			)
+	},
+
+	removeHorizontal (ID) {
+		API.removeHorizontal(ID)
+			.end(
+				(err, response) => {
+					state.horizontals = state.horizontals.filter(horizontal => horizontal.id !== ID);
+					this.trigger('updateHorizontals', state.horizontals);
+				}
+			)
 	}
+
 })
 
 export const VerticalsStore = Reflux.createStore({
@@ -59,8 +90,16 @@ export const VerticalsStore = Reflux.createStore({
 					this.trigger('updateVerticals', state.verticals);
 				}
 			)
+	},
+
+	removeHorizontal () {
+
 	}
 })
+
+	// 'removeNote',
+	// 'createNote',
+	// 'updateNote'
 
 export const NotesStore = Reflux.createStore({
 	listenables : [Actions],

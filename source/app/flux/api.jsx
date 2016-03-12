@@ -9,10 +9,22 @@ const getVerticals = () => {
 	return request
 		.delete('/verticals/' + ID)
  }
+ 
+ const removeHorizontal = (ID) => {
+	return request
+		.delete('/horizontals/' + ID)
+ }
 
  const updateVertical = (ID, data) => {
 	return request
 		.put('/api/verticals/' + ID)
+		.send(data)
+		.set('Accept', 'application/json')
+ }
+
+const updateHorizontal = (ID, data) => {
+	return request
+		.put('/api/horizontals/' + ID)
 		.send(data)
 		.set('Accept', 'application/json')
  }
@@ -29,6 +41,13 @@ const createVertical = (data) => {
 		.set('Accept', 'application/json')
 }
 
+const createHorizontal = (data) => {
+	return request
+		.post('/horizontals/')
+		.send(data)
+		.set('Accept', 'application/json')
+}
+
 const getNotes = () => {
 	return request
 		.get('/notes')
@@ -40,7 +59,10 @@ const API = {
 	getNotes : getNotes,
 	updateVertical : updateVertical,
 	removeVertical : removeVertical,
-	createVertical : createVertical
+	createVertical : createVertical,
+	createHorizontal : createHorizontal,
+	updateHorizontal : updateHorizontal,
+	removeHorizontal : removeHorizontal
 }
 
 export default API

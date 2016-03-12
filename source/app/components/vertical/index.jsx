@@ -12,11 +12,18 @@ export default class Vertical extends React.Component {
 			horizontals : props.horizontals,
 			notes : props.notes,
 			editiing : false,
-			showModal : false
+			showModal : false,
+			creatingNewHorizontal : false
 		}
 		this.close = this.close.bind(this);
 		this.open = this.open.bind(this);
 		this.removeVertical = this.removeVertical.bind(this);
+	}
+
+	componentWillReceiveProps (newProps) {
+		this.setState({
+			horizontals : newProps.horizontals
+		})
 	}
 
 	render () {
@@ -44,10 +51,12 @@ export default class Vertical extends React.Component {
 						<ButtonGroup className='edit-panel'>
 							<Button bsSize="xsmall" onClick={event => this.setState({editing: true})}><Glyphicon glyph="pencil" /></Button>
 							<Button bsSize="xsmall" onClick={event => this.setState({showModal: true})}><Glyphicon glyph="remove" /></Button>
+							<Button bsSize="xsmall" onClick={event => Actions.createHorizontal({vertical: this.props.id})} ><Glyphicon glyph="plus-sign" /></Button>
 						</ButtonGroup>
 					</h2>
 					{this.renderModal()}
 					{this.renderHorizontals()}
+					{this.renderNewHorizontalForm()}
 				</Col>
 			)
 		}
@@ -81,6 +90,17 @@ export default class Vertical extends React.Component {
 			</Modal.Footer>
 			</Modal>
 		)
+	}
+
+
+	renderNewHorizontalForm () {
+		if (this.state.creatingNewHorizontal) {
+			return (
+				<Horizontal {...{"title" : "New one", "id" : 0}} key={0} notes={[]}/>
+			)
+		} else {
+			return null
+		}
 	}
 
 	close () {

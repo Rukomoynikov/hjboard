@@ -1,14 +1,17 @@
 import React from 'react';
-import {Row, Col, Glyphicon, ButtonGroup, Button, ListGroup, ListGroupItem} from 'react-bootstrap';
+import {Row, Col, Glyphicon, ButtonGroup, Button, ListGroup, ListGroupItem, Modal} from 'react-bootstrap';
 
 import Note from '../note/index.jsx';
+import Actions from '../../flux/actions.jsx'
 
 export default class Horizontal extends React.Component {
 	constructor (props) {
 		super(props);
 		this.state = {
 			title : props.title,
-			notes : props.notes
+			notes : props.notes,
+			showModal : false,
+			editing: false
 		}
 	}
 
@@ -16,16 +19,39 @@ export default class Horizontal extends React.Component {
 		return (
 			<Row className="show-grid" key={this.state.title} className='horizontal'>
 				<Col xs={12} md={12}>
-					<h4>{this.state.title}
-						<ButtonGroup className='edit-panel'>
-							<Button bsSize="xsmall"><Glyphicon glyph="pencil" /></Button>
-							<Button bsSize="xsmall"><Glyphicon glyph="remove" /></Button>
-						</ButtonGroup>
-					</h4>
+					{this.renderTitle()}
 					{this.renderNotes()}
+					{this.state.showModal ? this.renderModal() : null}
 				</Col>
 			</Row>
 		)
+	}
+
+	renderTitle () {
+		if (this.state.editing) {
+			return (
+				<h4>
+					<input
+						className='form-control leftInput'
+						type='text'
+						value={this.state.title}
+						ref="input"
+						onChange={ event => this.setState({title : event.target.value}) }
+					/>
+					<Button bsStyle="success" onClick={event => this.updateHorizontal() }><Glyphicon glyph="ok" /></Button>
+				</h4>
+			)
+		} else {
+			return (
+				<h4>
+					{this.state.title}
+					<ButtonGroup className='edit-panel'>
+						<Button bsSize="xsmall" onClick={event => this.setState({editing : true})}><Glyphicon glyph="pencil" /></Button>
+						<Button bsSize="xsmall" onClick={event => this.setState({showModal: true})}><Glyphicon glyph="remove" /></Button>
+					</ButtonGroup>
+				</h4>
+			)
+		}
 	}
 
 	renderNotes () {
@@ -43,4 +69,42 @@ export default class Horizontal extends React.Component {
 		)
 	}
 
+	renderModal () {
+		return (
+			<Modal show={this.state.showModal} onHide={this.close}>
+			<Modal.Header closeButton>
+				<Modal.Title>Remove  "{this.state.title}" ? </Modal.Title>
+			</Modal.Header>
+			<Modal.Body>
+				All notes included to this vertical will be removed too.
+			</Modal.Body>
+			<Modal.Footer>
+				<Button onClick={this.close}>No</Button>
+				<Button onClick={event => this.removeHorizontal()}>Yes</Button>
+			</Modal.Footer>
+			</Modal>
+		)
+	}
+
+	close () {
+		this.setState({ showModal: false });
+	}
+
+	open () {
+		this.setState({ showModal: true });
+	}
+
+	updateHorizontal () {
+		this.setState({editing: false})
+		var newHorizontal = {
+			title : this.state.title,
+			vertical : this.props.vertical
+		}
+		Actions.updateHorizontal(this.props.id, newHorizontal)
+	}
+
+	removeHorizontal () {
+		this.setState({showModal: false})
+		Actions.removeHorizontal(this.props.id)
+	}
 }
