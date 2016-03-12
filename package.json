@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "./node_modules/concurrently/src/main.js \"webpack --watch\" \"./node_modules/json-server/bin/index.js ./json-data/db.json --static ./distributive \" "
+    "dev": "./node_modules/concurrently/src/main.js \"webpack --watch\" \"./node_modules/json-server/bin/index.js ./json-data/db.json --static ./distributive --routes ./json-data/routes.json \" "
   },
   "keywords": [],
   "author": "",

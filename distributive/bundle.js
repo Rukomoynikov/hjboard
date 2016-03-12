@@ -82,7 +82,7 @@
 
 	var _actions2 = _interopRequireDefault(_actions);
 
-	var _index = __webpack_require__(505);
+	var _index = __webpack_require__(499);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -102,11 +102,12 @@
 
 			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Main).call(this));
 
-			console.log(_index2.default);
 			_this.state = {
 				verticals: [],
 				horizontals: [],
-				notes: []
+				notes: [],
+				creatingNew: false,
+				title: null
 			};
 			_reflux2.default.all(_stores.HorizontalsStore, _stores.VerticalsStore, _stores.NotesStore).listen(function (dataHorizontalsStore, dataVerticalsStore, dataNotesStore) {
 				_this.setState({
@@ -114,6 +115,16 @@
 					horizontals: dataHorizontalsStore[1],
 					notes: dataNotesStore[1]
 				});
+			});
+			_stores.VerticalsStore.listen(function (eventName, data) {
+				console.log(eventName, data);
+				if (eventName === 'updateVerticals') {
+					console.log(data);
+					_this.setState({
+						verticals: data,
+						creatingNew: false
+					});
+				}
 			});
 			_actions2.default.getHorizontals();
 			_actions2.default.getVerticals();
@@ -124,15 +135,16 @@
 		_createClass(Main, [{
 			key: 'render',
 			value: function render() {
-				var css = __webpack_require__(499);
-				var dragulacss = __webpack_require__(503);
+				var css = __webpack_require__(502);
+				var dragulacss = __webpack_require__(506);
 				return _react2.default.createElement(
 					_reactBootstrap.Grid,
 					{ fluid: true },
 					_react2.default.createElement(
 						_reactBootstrap.Row,
 						{ className: 'show-grid' },
-						this.renderVerticals()
+						this.renderVerticals(),
+						this.renderFormNewVertical()
 					)
 				);
 			}
@@ -148,8 +160,65 @@
 					var notes = _this2.state.notes.filter(function (note) {
 						return note.vertical === vertical.id;
 					});
-					return _react2.default.createElement(_index2.default, _extends({}, vertical, { key: vertical.title, horizontals: horinzontals, notes: notes }));
+					return _react2.default.createElement(_index2.default, _extends({}, vertical, { key: vertical.title + vertical.id, horizontals: horinzontals, notes: notes }));
 				});
+			}
+		}, {
+			key: 'renderFormNewVertical',
+			value: function renderFormNewVertical() {
+				var _this3 = this;
+
+				if (this.state.creatingNew) {
+					return _react2.default.createElement(
+						_reactBootstrap.Col,
+						{ xs: 2, md: 2, className: 'vertical' },
+						_react2.default.createElement(
+							'h2',
+							null,
+							_react2.default.createElement('input', {
+								className: 'form-control leftInput',
+								type: 'text',
+								value: this.state.title,
+								ref: 'input',
+								onChange: function onChange(event) {
+									return _this3.setState({ title: event.target.value });
+								}
+							}),
+							_react2.default.createElement(
+								_reactBootstrap.Button,
+								{ bsStyle: 'success', onClick: function onClick(event) {
+										return _this3.addVertical();
+									} },
+								_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'ok' })
+							)
+						)
+					);
+				} else {
+					return _react2.default.createElement(
+						_reactBootstrap.Col,
+						{ xs: 2, md: 2, className: 'vertical' },
+						_react2.default.createElement(
+							'h2',
+							null,
+							_react2.default.createElement(
+								_reactBootstrap.Button,
+								{ bsStyle: 'success', onClick: function onClick(event) {
+										return _this3.setState({ creatingNew: true });
+									} },
+								_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'ok' }),
+								' Add'
+							)
+						)
+					);
+				}
+			}
+		}, {
+			key: 'addVertical',
+			value: function addVertical() {
+				var data = {
+					title: this.state.title
+				};
+				_actions2.default.createVertical(data);
 			}
 		}]);
 
@@ -61470,6 +61539,30 @@
 				state.verticals = JSON.parse(response.text);
 				_this2.trigger('getVerticals', state.verticals);
 			});
+		},
+		removeVertical: function removeVertical(ID) {
+			var _this3 = this;
+
+			_api2.default.removeVertical(ID).end(function (err, response) {
+				state.verticals = state.verticals.filter(function (vertical) {
+					return vertical.id !== ID;
+				});
+				_this3.trigger('updateVerticals', state.verticals);
+			});
+		},
+		updateVertical: function updateVertical(ID, data) {
+			_api2.default.updateVertical(ID, data).end(function (err, response) {
+				// console.log(response)
+			});
+		},
+		createVertical: function createVertical(data) {
+			var _this4 = this;
+
+			_api2.default.createVertical(data).end(function (err, response) {
+				var newVertical = JSON.parse(response.text);
+				state.verticals.push(newVertical);
+				_this4.trigger('updateVerticals', state.verticals);
+			});
 		}
 	});
 
@@ -61477,11 +61570,11 @@
 		listenables: [_actions2.default],
 
 		getNotes: function getNotes() {
-			var _this3 = this;
+			var _this5 = this;
 
 			_api2.default.getNotes().end(function (err, response) {
 				state.notes = JSON.parse(response.text);
-				_this3.trigger('getNotes', state.notes);
+				_this5.trigger('getNotes', state.notes);
 			});
 		}
 	});
@@ -61502,7 +61595,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var Actions = _reflux2.default.createActions(['getVerticals', 'getHorizontals', 'getNotes']);
+	var Actions = _reflux2.default.createActions(['getVerticals', 'getHorizontals', 'getNotes', 'removeVertical', 'updateVertical', 'createVertical']);
 
 	exports.default = Actions;
 
@@ -61526,8 +61619,20 @@
 		return _superagent2.default.get('/verticals');
 	};
 
+	var removeVertical = function removeVertical(ID) {
+		return _superagent2.default.delete('/verticals/' + ID);
+	};
+
+	var updateVertical = function updateVertical(ID, data) {
+		return _superagent2.default.put('/api/verticals/' + ID).send(data).set('Accept', 'application/json');
+	};
+
 	var getHorizontals = function getHorizontals() {
 		return _superagent2.default.get('/horizontals');
+	};
+
+	var createVertical = function createVertical(data) {
+		return _superagent2.default.post('/verticals/').send(data).set('Accept', 'application/json');
 	};
 
 	var getNotes = function getNotes() {
@@ -61537,7 +61642,10 @@
 	var API = {
 		getVerticals: getVerticals,
 		getHorizontals: getHorizontals,
-		getNotes: getNotes
+		getNotes: getNotes,
+		updateVertical: updateVertical,
+		removeVertical: removeVertical,
+		createVertical: createVertical
 	};
 
 	exports.default = API;
@@ -63038,13 +63146,375 @@
 /* 499 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactBootstrap = __webpack_require__(178);
+
+	var _actions = __webpack_require__(490);
+
+	var _actions2 = _interopRequireDefault(_actions);
+
+	var _index = __webpack_require__(500);
+
+	var _index2 = _interopRequireDefault(_index);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Vertical = function (_React$Component) {
+		_inherits(Vertical, _React$Component);
+
+		function Vertical(props) {
+			_classCallCheck(this, Vertical);
+
+			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Vertical).call(this, props));
+
+			_this.state = {
+				title: props.title,
+				horizontals: props.horizontals,
+				notes: props.notes,
+				editiing: false,
+				showModal: false
+			};
+			_this.close = _this.close.bind(_this);
+			_this.open = _this.open.bind(_this);
+			_this.removeVertical = _this.removeVertical.bind(_this);
+			return _this;
+		}
+
+		_createClass(Vertical, [{
+			key: 'render',
+			value: function render() {
+				var _this2 = this;
+
+				if (this.state.editing) {
+					return _react2.default.createElement(
+						_reactBootstrap.Col,
+						{ xs: 2, md: 2, className: 'vertical' },
+						_react2.default.createElement(
+							'h2',
+							null,
+							_react2.default.createElement('input', {
+								className: 'form-control leftInput',
+								type: 'text',
+								value: this.state.title,
+								ref: 'input',
+								onChange: function onChange(event) {
+									return _this2.setState({ title: event.target.value });
+								}
+							}),
+							_react2.default.createElement(
+								_reactBootstrap.Button,
+								{ bsStyle: 'success', onClick: function onClick(event) {
+										return _this2.updateVertical();
+									} },
+								_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'ok' })
+							)
+						),
+						this.renderModal(),
+						this.renderHorizontals()
+					);
+				} else {
+					return _react2.default.createElement(
+						_reactBootstrap.Col,
+						{ xs: 2, md: 2, className: 'vertical' },
+						_react2.default.createElement(
+							'h2',
+							null,
+							this.state.title,
+							_react2.default.createElement(
+								_reactBootstrap.ButtonGroup,
+								{ className: 'edit-panel' },
+								_react2.default.createElement(
+									_reactBootstrap.Button,
+									{ bsSize: 'xsmall', onClick: function onClick(event) {
+											return _this2.setState({ editing: true });
+										} },
+									_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'pencil' })
+								),
+								_react2.default.createElement(
+									_reactBootstrap.Button,
+									{ bsSize: 'xsmall', onClick: function onClick(event) {
+											return _this2.setState({ showModal: true });
+										} },
+									_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'remove' })
+								)
+							)
+						),
+						this.renderModal(),
+						this.renderHorizontals()
+					);
+				}
+			}
+		}, {
+			key: 'renderHorizontals',
+			value: function renderHorizontals() {
+				var _this3 = this;
+
+				return this.state.horizontals.map(function (horizontal) {
+					var notes = _this3.state.notes.filter(function (note) {
+						return note.horizontal === horizontal.id;
+					});
+					return _react2.default.createElement(_index2.default, _extends({}, horizontal, { key: horizontal.id, notes: notes }));
+				});
+			}
+		}, {
+			key: 'renderModal',
+			value: function renderModal() {
+				return _react2.default.createElement(
+					_reactBootstrap.Modal,
+					{ show: this.state.showModal, onHide: this.close },
+					_react2.default.createElement(
+						_reactBootstrap.Modal.Header,
+						{ closeButton: true },
+						_react2.default.createElement(
+							_reactBootstrap.Modal.Title,
+							null,
+							'Remove  "',
+							this.state.title,
+							'" ? '
+						)
+					),
+					_react2.default.createElement(
+						_reactBootstrap.Modal.Body,
+						null,
+						'All notes included to this vertical will be removed too.'
+					),
+					_react2.default.createElement(
+						_reactBootstrap.Modal.Footer,
+						null,
+						_react2.default.createElement(
+							_reactBootstrap.Button,
+							{ onClick: this.close },
+							'No'
+						),
+						_react2.default.createElement(
+							_reactBootstrap.Button,
+							{ onClick: this.removeVertical },
+							'Yes'
+						)
+					)
+				);
+			}
+		}, {
+			key: 'close',
+			value: function close() {
+				this.setState({ showModal: false });
+			}
+		}, {
+			key: 'open',
+			value: function open() {
+				this.setState({ showModal: true });
+			}
+		}, {
+			key: 'removeVertical',
+			value: function removeVertical() {
+				_actions2.default.removeVertical(this.props.id);
+			}
+		}, {
+			key: 'updateVertical',
+			value: function updateVertical() {
+				this.setState({ editing: false });
+				var newVertical = {
+					title: this.state.title
+				};
+				_actions2.default.updateVertical(this.props.id, newVertical);
+			}
+		}]);
+
+		return Vertical;
+	}(_react2.default.Component);
+
+	exports.default = Vertical;
+
+/***/ },
+/* 500 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactBootstrap = __webpack_require__(178);
+
+	var _index = __webpack_require__(501);
+
+	var _index2 = _interopRequireDefault(_index);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Horizontal = function (_React$Component) {
+		_inherits(Horizontal, _React$Component);
+
+		function Horizontal(props) {
+			_classCallCheck(this, Horizontal);
+
+			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Horizontal).call(this, props));
+
+			_this.state = {
+				title: props.title,
+				notes: props.notes
+			};
+			return _this;
+		}
+
+		_createClass(Horizontal, [{
+			key: 'render',
+			value: function render() {
+				return _react2.default.createElement(
+					_reactBootstrap.Row,
+					_defineProperty({ className: 'show-grid', key: this.state.title }, 'className', 'horizontal'),
+					_react2.default.createElement(
+						_reactBootstrap.Col,
+						{ xs: 12, md: 12 },
+						_react2.default.createElement(
+							'h4',
+							null,
+							this.state.title,
+							_react2.default.createElement(
+								_reactBootstrap.ButtonGroup,
+								{ className: 'edit-panel' },
+								_react2.default.createElement(
+									_reactBootstrap.Button,
+									{ bsSize: 'xsmall' },
+									_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'pencil' })
+								),
+								_react2.default.createElement(
+									_reactBootstrap.Button,
+									{ bsSize: 'xsmall' },
+									_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'remove' })
+								)
+							)
+						),
+						this.renderNotes()
+					)
+				);
+			}
+		}, {
+			key: 'renderNotes',
+			value: function renderNotes() {
+				return _react2.default.createElement(
+					_reactBootstrap.ListGroup,
+					null,
+					this.state.notes.map(function (note) {
+						return _react2.default.createElement(_index2.default, _extends({}, note, { key: note.title }));
+					}),
+					_react2.default.createElement(
+						_reactBootstrap.ListGroupItem,
+						null,
+						'Добавить'
+					)
+				);
+			}
+		}]);
+
+		return Horizontal;
+	}(_react2.default.Component);
+
+	exports.default = Horizontal;
+
+/***/ },
+/* 501 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactBootstrap = __webpack_require__(178);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Note = function (_React$Component) {
+		_inherits(Note, _React$Component);
+
+		function Note(props) {
+			_classCallCheck(this, Note);
+
+			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Note).call(this, props));
+
+			_this.state = {
+				title: props.title
+			};
+			return _this;
+		}
+
+		_createClass(Note, [{
+			key: 'render',
+			value: function render() {
+				return _react2.default.createElement(
+					_reactBootstrap.ListGroupItem,
+					{ key: this.state.title },
+					this.state.title
+				);
+			}
+		}]);
+
+		return Note;
+	}(_react2.default.Component);
+
+	exports.default = Note;
+
+/***/ },
+/* 502 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(500);
+	var content = __webpack_require__(503);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(502)(content, {});
+	var update = __webpack_require__(505)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -63061,21 +63531,21 @@
 	}
 
 /***/ },
-/* 500 */
+/* 503 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(501)();
+	exports = module.exports = __webpack_require__(504)();
 	// imports
 
 
 	// module
-	exports.push([module.id, "#app {\n\tpadding: 0px 20px;\n}\n.vertical {\n\tmargin-right: 20px;\n}\n\n.horizontal {\n\tbackground: #c7c7c7;\n\tmargin-bottom: 20px;\n\tborder-radius: 20px;\n}\n\n.edit-panel {\n\tmargin-left: 5px;\n}\n\n", ""]);
+	exports.push([module.id, "#app {\n\tpadding: 0px 20px;\n}\n.vertical {\n\tbackground: #E3E0E2;\n\tmargin-right: 20px;\n}\n\n.btn-group {\n\tvisibility: hidden;\n}\n\n.vertical:hover > h2 > .btn-group {\n\tvisibility: visible;\n}\n\n.horizontal:hover  .btn-group {\n\tvisibility: visible;\n}\n\n.horizontal {\n\tbackground: #c7c7c7;\n\tmargin: 0px 0px 20px 0px;\n\tborder-radius: 20px;\n}\n\n.edit-panel {\n\tmargin-left: 5px;\n}\n\n.leftInput {\n\tdisplay: inline-block;\n\twidth: auto;\n\tvertical-align: middle;\n\tmargin-right: 5px;\n}\n", ""]);
 
 	// exports
 
 
 /***/ },
-/* 501 */
+/* 504 */
 /***/ function(module, exports) {
 
 	/*
@@ -63131,7 +63601,7 @@
 
 
 /***/ },
-/* 502 */
+/* 505 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -63385,16 +63855,16 @@
 
 
 /***/ },
-/* 503 */
+/* 506 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(504);
+	var content = __webpack_require__(507);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(502)(content, {});
+	var update = __webpack_require__(505)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -63411,10 +63881,10 @@
 	}
 
 /***/ },
-/* 504 */
+/* 507 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(501)();
+	exports = module.exports = __webpack_require__(504)();
 	// imports
 
 
@@ -63423,261 +63893,6 @@
 
 	// exports
 
-
-/***/ },
-/* 505 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactBootstrap = __webpack_require__(178);
-
-	var _index = __webpack_require__(506);
-
-	var _index2 = _interopRequireDefault(_index);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var Vertical = function (_React$Component) {
-		_inherits(Vertical, _React$Component);
-
-		function Vertical(props) {
-			_classCallCheck(this, Vertical);
-
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Vertical).call(this, props));
-
-			_this.state = {
-				title: props.title,
-				horizontals: props.horizontals,
-				notes: props.notes
-			};
-			return _this;
-		}
-
-		_createClass(Vertical, [{
-			key: 'render',
-			value: function render() {
-				return _react2.default.createElement(
-					_reactBootstrap.Col,
-					{ xs: 2, md: 2, className: 'vertical' },
-					_react2.default.createElement(
-						'h2',
-						null,
-						this.props.title,
-						_react2.default.createElement(
-							_reactBootstrap.ButtonGroup,
-							{ className: 'edit-panel' },
-							_react2.default.createElement(
-								_reactBootstrap.Button,
-								{ bsSize: 'xsmall' },
-								_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'pencil' })
-							),
-							_react2.default.createElement(
-								_reactBootstrap.Button,
-								{ bsSize: 'xsmall' },
-								_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'remove' })
-							)
-						)
-					),
-					this.renderHorizontals()
-				);
-			}
-		}, {
-			key: 'renderHorizontals',
-			value: function renderHorizontals() {
-				var _this2 = this;
-
-				return this.state.horizontals.map(function (horizontal) {
-					var notes = _this2.state.notes.filter(function (note) {
-						return note.horizontal === horizontal.id;
-					});
-					return _react2.default.createElement(_index2.default, _extends({}, horizontal, { key: horizontal.id, notes: notes }));
-				});
-			}
-		}]);
-
-		return Vertical;
-	}(_react2.default.Component);
-
-	exports.default = Vertical;
-
-/***/ },
-/* 506 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactBootstrap = __webpack_require__(178);
-
-	var _index = __webpack_require__(507);
-
-	var _index2 = _interopRequireDefault(_index);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var Horizontal = function (_React$Component) {
-		_inherits(Horizontal, _React$Component);
-
-		function Horizontal(props) {
-			_classCallCheck(this, Horizontal);
-
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Horizontal).call(this, props));
-
-			_this.state = {
-				title: props.title,
-				notes: props.notes
-			};
-			return _this;
-		}
-
-		_createClass(Horizontal, [{
-			key: 'render',
-			value: function render() {
-				return _react2.default.createElement(
-					_reactBootstrap.Row,
-					_defineProperty({ className: 'show-grid', key: this.state.title }, 'className', 'horizontal'),
-					_react2.default.createElement(
-						_reactBootstrap.Col,
-						{ xs: 12, md: 12 },
-						_react2.default.createElement(
-							'h4',
-							null,
-							this.state.title,
-							_react2.default.createElement(
-								_reactBootstrap.ButtonGroup,
-								{ className: 'edit-panel' },
-								_react2.default.createElement(
-									_reactBootstrap.Button,
-									{ bsSize: 'xsmall' },
-									_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'pencil' })
-								),
-								_react2.default.createElement(
-									_reactBootstrap.Button,
-									{ bsSize: 'xsmall' },
-									_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'remove' })
-								)
-							)
-						),
-						this.renderNotes()
-					)
-				);
-			}
-		}, {
-			key: 'renderNotes',
-			value: function renderNotes() {
-				return _react2.default.createElement(
-					_reactBootstrap.ListGroup,
-					null,
-					this.state.notes.map(function (note) {
-						return _react2.default.createElement(_index2.default, _extends({}, note, { key: note.title }));
-					}),
-					_react2.default.createElement(
-						_reactBootstrap.ListGroupItem,
-						null,
-						'Добавить'
-					)
-				);
-			}
-		}]);
-
-		return Horizontal;
-	}(_react2.default.Component);
-
-	exports.default = Horizontal;
-
-/***/ },
-/* 507 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactBootstrap = __webpack_require__(178);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var Note = function (_React$Component) {
-		_inherits(Note, _React$Component);
-
-		function Note(props) {
-			_classCallCheck(this, Note);
-
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Note).call(this, props));
-
-			_this.state = {
-				title: props.title
-			};
-			return _this;
-		}
-
-		_createClass(Note, [{
-			key: 'render',
-			value: function render() {
-				return _react2.default.createElement(
-					_reactBootstrap.ListGroupItem,
-					{ key: this.state.title },
-					this.state.title
-				);
-			}
-		}]);
-
-		return Note;
-	}(_react2.default.Component);
-
-	exports.default = Note;
 
 /***/ }
 /******/ ]);

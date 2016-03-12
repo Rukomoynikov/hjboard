@@ -14,11 +14,12 @@ import Vertical from './components/vertical/index.jsx';
 export default class Main extends React.Component {
 	constructor () {
 		super()
-		console.log(Vertical)
 		this.state = {
 			verticals : [],
 			horizontals : [],
-			notes : []
+			notes : [],
+			creatingNew : false,
+			title : null
 		}
 		Reflux.all(HorizontalsStore, VerticalsStore, NotesStore)
 			.listen((dataHorizontalsStore, dataVerticalsStore, dataNotesStore) => {
@@ -28,6 +29,18 @@ export default class Main extends React.Component {
 					notes : dataNotesStore[1]
 				})
 			})
+		VerticalsStore.listen(
+			(eventName, data) => {
+				console.log(eventName, data);
+				if(eventName === 'updateVerticals') {
+					console.log(data)
+					this.setState({
+						verticals : data,
+						creatingNew : false
+					})
+				}
+			}
+		)
 		Actions.getHorizontals();
 		Actions.getVerticals();
 		Actions.getNotes();
@@ -40,6 +53,7 @@ export default class Main extends React.Component {
 			<Grid fluid={true}>
 				<Row className="show-grid">
 					{this.renderVerticals()}
+					{this.renderFormNewVertical()}
 				</Row>
 			</Grid>
 		)
@@ -55,10 +69,42 @@ export default class Main extends React.Component {
 					note => note.vertical === vertical.id
 				)
 				return (
-					<Vertical {...vertical} key={vertical.title} horizontals={horinzontals} notes={notes} />
+					<Vertical {...vertical} key={vertical.title + vertical.id} horizontals={horinzontals} notes={notes} />
 				)
 			}
 		)
+	}
+
+	renderFormNewVertical () {
+		if(this.state.creatingNew) {
+			return (
+				<Col xs={2} md={2} className='vertical'>
+					<h2>
+						<input
+							className='form-control leftInput'
+							type='text'
+							value={this.state.title}
+							ref="input"
+							onChange={ event => this.setState({title : event.target.value}) }
+						/>
+						<Button bsStyle="success" onClick={event => this.addVertical() }><Glyphicon glyph="ok" /></Button>
+					</h2>
+				</Col>
+			)
+		} else {
+			return (
+				<Col xs={2} md={2} className='vertical'>
+					<h2><Button bsStyle="success" onClick={event => this.setState({creatingNew : true})}><Glyphicon glyph="ok" /> Add</Button></h2>
+				</Col>
+			)
+		}
+	}
+
+	addVertical () {
+		var data = {
+			title : this.state.title
+		}
+		Actions.createVertical(data)
 	}
 
 }

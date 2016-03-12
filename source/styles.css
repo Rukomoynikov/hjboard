@@ -2,12 +2,25 @@
 	padding: 0px 20px;
 }
 .vertical {
+	background: #E3E0E2;
 	margin-right: 20px;
+}
+
+.btn-group {
+	visibility: hidden;
+}
+
+.vertical:hover > h2 > .btn-group {
+	visibility: visible;
+}
+
+.horizontal:hover  .btn-group {
+	visibility: visible;
 }
 
 .horizontal {
 	background: #c7c7c7;
-	margin-bottom: 20px;
+	margin: 0px 0px 20px 0px;
 	border-radius: 20px;
 }
 
@@ -15,3 +28,9 @@
 	margin-left: 5px;
 }
 
+.leftInput {
+	display: inline-block;
+	width: auto;
+	vertical-align: middle;
+	margin-right: 5px;
+}

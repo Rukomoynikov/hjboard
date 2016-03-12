@@ -6,9 +6,16 @@
       "order": 1
     },
     {
-      "id": 2,
       "title": "People",
-      "order": 2
+      "id": 2
+    },
+    {
+      "title": "dfjfdgj",
+      "id": 4
+    },
+    {
+      "title": "dfjhfj",
+      "id": 5
     }
   ],
   "horizontals": [
@@ -36,6 +43,18 @@
       "title": "McDonalds for Vegans",
       "vertical": 1,
       "horizontal": 1,
+      "order": 1
+    },
+    {
+      "title": "McDonalds for not Vegans",
+      "vertical": 1,
+      "horizontal": 2,
+      "order": 1
+    },
+    {
+      "title": "Tetya Masha Neighboor",
+      "vertical": 2,
+      "horizontal": 3,
       "order": 1
     }
   ]

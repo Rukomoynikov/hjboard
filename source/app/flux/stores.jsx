@@ -27,8 +27,38 @@ export const VerticalsStore = Reflux.createStore({
 		API.getVerticals()
 			.end((err, response) => {
 				state.verticals = JSON.parse(response.text);
-				this.trigger('getVerticals', state.verticals)
+				this.trigger('getVerticals', state.verticals);
 			})
+	},
+
+	removeVertical (ID) {
+		API.removeVertical(ID)
+			.end(
+				(err, response) => {
+					state.verticals = state.verticals.filter(vertical => vertical.id !== ID);
+					this.trigger('updateVerticals', state.verticals);
+				}
+			)
+	},
+
+	updateVertical (ID, data) {
+		API.updateVertical(ID, data)
+			.end(
+				(err, response) => {
+					// console.log(response)
+				}
+			)
+	},
+
+	createVertical (data) {
+		API.createVertical(data)
+			.end(
+				(err, response) => {
+					var newVertical = JSON.parse(response.text);
+					state.verticals.push(newVertical);
+					this.trigger('updateVerticals', state.verticals);
+				}
+			)
 	}
 })
 
