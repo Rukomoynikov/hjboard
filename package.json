@@ -18,7 +18,8 @@
     "react-dragula": "^1.1.15",
     "reflux": "^0.4.0",
     "superagent": "^1.8.0",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "json-server": "^0.8.8"
   },
   "devDependencies": {
     "babel-core": "^6.7.2",
@@ -28,7 +29,6 @@
     "concurrently": "^2.0.0",
     "css-loader": "^0.23.1",
     "html-webpack-plugin": "^2.10.0",
-    "json-server": "^0.8.8",
     "style-loader": "^0.13.0",
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1"
