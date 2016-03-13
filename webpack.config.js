@@ -2,7 +2,7 @@ var path = require('path');
 var HTMLWebpackPlugin = require('html-webpack-plugin');
 
 var SOURCE_DIR = path.resolve(__dirname, './source')
-var DISTRIBUTIVE_DIR = path.resolve(__dirname, './distributive')
+var DISTRIBUTIVE_DIR = path.resolve(__dirname, './public')
 
 module.exports = {
 	entry : path.resolve(SOURCE_DIR, "./app/main.jsx"),
