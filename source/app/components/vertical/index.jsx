@@ -21,7 +21,6 @@ export default class Vertical extends React.Component {
 	}
 
 	componentWillReceiveProps (newProps) {
-		console.log(newProps)
 		this.setState({
 			horizontals : newProps.horizontals,
 			notes : newProps.notes

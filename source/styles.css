@@ -22,6 +22,7 @@
 	background: #c7c7c7;
 	margin: 0px 0px 20px 0px;
 	border-radius: 20px;
+	padding-bottom : 10px;
 }
 
 .edit-panel {
@@ -60,4 +61,12 @@
 
 .note:hover .removeNoteButton {
 	visibility: visible;
+}
+
+.list-group {
+	min-height: 10px;
+}
+
+.list-group + button {
+	margin-bottom: 10px;
 }

@@ -130,6 +130,7 @@ export const NotesStore = Reflux.createStore({
 	},
 
 	updateNote (ID, data) {
+		console.log(ID, data)
 		API.updateNote(ID, data)
 			.end(
 				(err, response) => {

@@ -17,9 +17,15 @@ export default class Horizontal extends React.Component {
 		}
 	}
 
+	componentWillReceiveProps (newProps) {
+		this.setState({
+			notes : newProps.notes
+		})
+	}
+
 	render () {
 		return (
-			<Row className="show-grid" key={this.state.title} className='horizontal'>
+			<Row className="show-grid" key={this.state.title} className='horizontal' data-vertical-id={this.props.vertical} data-horizontal-id={this.props.id}>
 				<Col xs={12} md={12}>
 					{this.renderTitle()}
 					{this.renderNotes()}
@@ -58,7 +64,7 @@ export default class Horizontal extends React.Component {
 
 	renderNotes () {
 		return (
-			<ListGroup ref={'ListGroup'}>
+			<div><ListGroup ref={'ListGroup'}>
 				{this.state.notes.map(
 					(note) => {
 						return (
@@ -66,6 +72,7 @@ export default class Horizontal extends React.Component {
 						)
 					}
 				)}
+				</ListGroup>
 					{
 						this.state.creatingNote ?
 						(<div style={{textAlign: "center", marginTop : "10px"}} className='buttonAddNote'>
@@ -81,8 +88,7 @@ export default class Horizontal extends React.Component {
 						:
 						(<Button bsStyle="success" onClick={event => this.setState({creatingNote : true})}><Glyphicon glyph="plus" />Добавить</Button>)
 					}
-
-			</ListGroup>
+			</div>
 		)
 	}
 
@@ -137,7 +143,6 @@ export default class Horizontal extends React.Component {
 
 	componentDidMount () {
 		window.dragula.containers.push(ReactDOM.findDOMNode(this.refs.ListGroup))
-		// dragula([])
 	}
 
 }

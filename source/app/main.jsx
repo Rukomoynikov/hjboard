@@ -127,16 +127,20 @@ export default class Main extends React.Component {
 	componentDidMount () {
 		window.dragula = dragula([], {
 			moves: function (el, source, handle, sibling) {
-				console.log(el, source, sibling)
+				// console.log(el, source, sibling)
 				return true; // elements are always draggable by default
 			},
 			accepts: function (el, target, source, sibling) {
-				console.log(el, source, sibling)
+				// console.log(el, target, source, sibling)
 				return true; // elements can be dropped in any of the `containers` by default
 			}
 		});
-		// var arr = document.querySelectorAll('.list-group');
-		// var arr2 = []; for (var i = 0; arr.length > i; i++) {arr2.push(arr[i])}
+		window.dragula.on('drop' , (el, target, source, sibling) => {
+			var updatedNote = this.state.notes.filter(note => note.id === Number(el.dataset.noteId))[0];
+			updatedNote.vertical = Number(target.parentElement.parentElement.parentElement.dataset.verticalId);
+			updatedNote.horizontal = Number(target.parentElement.parentElement.parentElement.dataset.horizontalId);
+			Actions.updateNote(Number(el.dataset.noteId), updatedNote)
+		})
 	}
 
 }
