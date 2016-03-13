@@ -2,22 +2,22 @@ import request from 'superagent';
 
 const getVerticals = () => {
 	return request
-		.get('/verticals')
+		.get('/api/verticals')
 }
 
  const removeVertical = (ID) => {
 	return request
-		.delete('/verticals/' + ID)
+		.delete('/api/verticals/' + ID)
  }
 
  const removeHorizontal = (ID) => {
 	return request
-		.delete('/horizontals/' + ID)
+		.delete('/api/horizontals/' + ID)
  }
 
  const removeNote = (ID) => {
 	return request
-		.delete('/notes/' + ID)
+		.delete('/api/notes/' + ID)
  }
 
  const updateVertical = (ID, data) => {
@@ -36,38 +36,38 @@ const updateHorizontal = (ID, data) => {
 
 const getHorizontals = () => {
 	return request
-		.get('/horizontals')
+		.get('/api/horizontals')
 }
 
 const createVertical = (data) => {
 	return request
-		.post('/verticals/')
+		.post('/api/verticals/')
 		.send(data)
 		.set('Accept', 'application/json')
 }
 
 const createHorizontal = (data) => {
 	return request
-		.post('/horizontals/')
+		.post('/api/horizontals/')
 		.send(data)
 		.set('Accept', 'application/json')
 }
 
 const getNotes = () => {
 	return request
-		.get('/notes')
+		.get('/api/notes')
 }
 
 const createNote = (data) => {
 	return request
-		.post('/notes/')
+		.post('/api/notes/')
 		.send(data)
 		.set('Accept', 'application/json')
 }
 
 const updateNote = (ID, data) => {
 	return request
-		.put('/notes/' + ID)
+		.put('/api/notes/' + ID)
 		.send(data)
 		.set('Accept', 'application/json')
 }
