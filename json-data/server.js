@@ -5,7 +5,7 @@ var data = require('./db.json')
 var port = process.env.PORT || 3000
 
 var app = jsonServer.create()
-var router = jsonServer.router(clone(data))
+var router = jsonServer.router(data)
 
 app.all('*', function(req, res, next) {
   router.db.object = clone(data)

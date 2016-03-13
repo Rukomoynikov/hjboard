@@ -63311,8 +63311,7 @@
 				horizontals: props.horizontals,
 				notes: props.notes,
 				editiing: false,
-				showModal: false,
-				creatingNewHorizontal: false
+				showModal: false
 			};
 			_this.close = _this.close.bind(_this);
 			_this.open = _this.open.bind(_this);
@@ -63395,8 +63394,7 @@
 							)
 						),
 						this.renderModal(),
-						this.renderHorizontals(),
-						this.renderNewHorizontalForm()
+						this.renderHorizontals()
 					);
 				}
 			}
@@ -63449,15 +63447,6 @@
 						)
 					)
 				);
-			}
-		}, {
-			key: 'renderNewHorizontalForm',
-			value: function renderNewHorizontalForm() {
-				if (this.state.creatingNewHorizontal) {
-					return _react2.default.createElement(_index2.default, _extends({ "title": "New one", "id": 0 }, { key: 0, notes: [] }));
-				} else {
-					return null;
-				}
 			}
 		}, {
 			key: 'close',
@@ -63741,7 +63730,10 @@
 		}, {
 			key: 'createNote',
 			value: function createNote() {
-				this.setState({ creatingNote: false });
+				this.setState({
+					creatingNote: false,
+					newNoteTitle: ""
+				});
 				var newNote = {
 					title: this.state.newNoteTitle,
 					vertical: this.props.vertical,

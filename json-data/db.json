@@ -9,7 +9,7 @@
       "id": 2
     },
     {
-      "title": "cfhfj",
+      "title": "Test",
       "id": 3
     }
   ],
@@ -41,21 +41,16 @@
       "id": 5
     },
     {
-      "title": "N",
       "vertical": 3,
       "id": 6
-    },
-    {
-      "vertical": 2,
-      "id": 7
     }
   ],
   "notes": [
     {
       "id": 1,
       "title": "McDonalds for Vegans",
-      "vertical": 1,
-      "horizontal": 1,
+      "vertical": 3,
+      "horizontal": 4,
       "order": 1
     },
     {
@@ -68,41 +63,15 @@
     {
       "id": 3,
       "title": "Tetya Masha Neighboor",
-      "vertical": 2,
-      "horizontal": 3,
+      "vertical": 3,
+      "horizontal": 6,
       "order": 1
     },
     {
-      "title": "dsg",
-      "vertical": 3,
-      "horizontal": 4,
-      "id": 4
-    },
-    {
-      "id": 7
-    },
-    {
-      "id": 8
-    },
-    {
-      "title": "vsdbsd",
-      "vertical": 2,
-      "horizontal": 7,
-      "id": 9,
-      "horinzontal": 5
-    },
-    {
-      "title": 111,
+      "title": "sadg",
       "vertical": 3,
       "horizontal": 5,
-      "id": 11,
-      "horinzontal": 5
-    },
-    {
-      "title": "sdhssfh",
-      "vertical": 3,
-      "horizontal": 6,
-      "id": 12
+      "id": 4
     }
   ]
 }

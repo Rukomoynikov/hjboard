@@ -132,7 +132,10 @@ export default class Horizontal extends React.Component {
 	}
 
 	createNote () {
-		this.setState({creatingNote: false})
+		this.setState({
+			creatingNote: false,
+			newNoteTitle : ""
+		})
 		var newNote = {
 			title : this.state.newNoteTitle,
 			vertical : this.props.vertical,

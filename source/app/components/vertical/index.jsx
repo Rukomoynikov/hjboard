@@ -12,8 +12,7 @@ export default class Vertical extends React.Component {
 			horizontals : props.horizontals,
 			notes : props.notes,
 			editiing : false,
-			showModal : false,
-			creatingNewHorizontal : false
+			showModal : false
 		}
 		this.close = this.close.bind(this);
 		this.open = this.open.bind(this);
@@ -57,7 +56,6 @@ export default class Vertical extends React.Component {
 					</h2>
 					{this.renderModal()}
 					{this.renderHorizontals()}
-					{this.renderNewHorizontalForm()}
 				</Col>
 			)
 		}
@@ -91,17 +89,6 @@ export default class Vertical extends React.Component {
 			</Modal.Footer>
 			</Modal>
 		)
-	}
-
-
-	renderNewHorizontalForm () {
-		if (this.state.creatingNewHorizontal) {
-			return (
-				<Horizontal {...{"title" : "New one", "id" : 0}} key={0} notes={[]}/>
-			)
-		} else {
-			return null
-		}
 	}
 
 	close () {
