@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
 
 import {Grid, Row, Col, ListGroup, ListGroupItem, Glyphicon, ButtonGroup, Button} from 'react-bootstrap';
-import ColorPicker from 'react-color';
 import dragula from 'react-dragula';
 
 import {HorizontalsStore, VerticalsStore, NotesStore} from './flux/stores.jsx';
@@ -19,7 +18,7 @@ export default class Main extends React.Component {
 			horizontals : [],
 			notes : [],
 			creatingNew : false,
-			title : null
+			title : ""
 		}
 		Reflux.all(HorizontalsStore, VerticalsStore, NotesStore)
 			.listen((dataHorizontalsStore, dataVerticalsStore, dataNotesStore) => {
@@ -144,6 +143,13 @@ export default class Main extends React.Component {
 			updatedNote.horizontal = target.parentElement.parentElement.parentElement.dataset.horizontalId;
 			Actions.updateNote(el.dataset.noteId, updatedNote)
 		})
+	}
+
+	componentDidUpdate () {
+		if (this.refs.input) {
+			this.refs.input.focus()
+			this.refs.input.selectionStart = this.state.title.length
+		}
 	}
 
 }
