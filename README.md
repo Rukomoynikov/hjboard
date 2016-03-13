@@ -9,6 +9,6 @@ Example of React project. Used :
 - React bootstrap
 - Json Server 
 
-Demo - https://github.com/Rukomoynikov/hjboard  
+Demo - https://hjboard.herokuapp.com/
 
 All update functions (create new, edit or remove) works only locally. So, git clone && npm install && npm run dev.)
