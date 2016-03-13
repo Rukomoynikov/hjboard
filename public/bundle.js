@@ -82,7 +82,7 @@
 
 	var _actions2 = _interopRequireDefault(_actions);
 
-	var _index = __webpack_require__(499);
+	var _index = __webpack_require__(501);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -148,8 +148,8 @@
 		_createClass(Main, [{
 			key: 'render',
 			value: function render() {
-				var css = __webpack_require__(502);
-				var dragulacss = __webpack_require__(506);
+				var css = __webpack_require__(504);
+				var dragulacss = __webpack_require__(508);
 				return _react2.default.createElement(
 					_reactBootstrap.Grid,
 					{ fluid: true },
@@ -231,6 +231,9 @@
 				var data = {
 					title: this.state.title
 				};
+				this.setState({
+					title: ""
+				});
 				_actions2.default.createVertical(data);
 			}
 		}, {
@@ -250,7 +253,7 @@
 				});
 				window.dragula.on('drop', function (el, target, source, sibling) {
 					var updatedNote = _this4.state.notes.filter(function (note) {
-						return note.id === Number(el.dataset.noteId);
+						return note.id == el.dataset.noteId;
 					})[0];
 					updatedNote.vertical = Number(target.parentElement.parentElement.parentElement.dataset.verticalId);
 					updatedNote.horizontal = Number(target.parentElement.parentElement.parentElement.dataset.horizontalId);
@@ -61545,6 +61548,10 @@
 
 	var _api2 = _interopRequireDefault(_api);
 
+	var _uuid = __webpack_require__(499);
+
+	var _uuid2 = _interopRequireDefault(_uuid);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var state = {
@@ -61557,36 +61564,30 @@
 		listenables: [_actions2.default],
 
 		getHorizontals: function getHorizontals() {
-			var _this = this;
-
-			_api2.default.getHorizontals().end(function (err, response) {
-				state.horizontals = JSON.parse(response.text);
-				_this.trigger('getHorizontals', state.horizontals);
-			});
+			this.trigger('getHorizontals', state.horizontals);
 		},
 		createHorizontal: function createHorizontal(data) {
-			var _this2 = this;
-
-			_api2.default.createHorizontal(data).end(function (err, response) {
-				var newHorizontal = JSON.parse(response.text);
-				state.horizontals.push(newHorizontal);
-				_this2.trigger('updateHorizontals', state.horizontals);
-			});
+			data.id = _uuid2.default.v1();
+			state.horizontals.push(data);
+			this.trigger('updateHorizontals', state.horizontals);
 		},
 		updateHorizontal: function updateHorizontal(ID, data) {
-			_api2.default.updateHorizontal(ID, data).end(function (err, response) {
-				// console.log(response)
-			});
+			// API.updateHorizontal(ID, data)
+			// 	.end(
+			// 		(err, response) => {
+			// 			// console.log(response)
+			// 		}
+			// 	)
 		},
 		removeHorizontal: function removeHorizontal(ID) {
-			var _this3 = this;
-
-			_api2.default.removeHorizontal(ID).end(function (err, response) {
-				state.horizontals = state.horizontals.filter(function (horizontal) {
-					return horizontal.id !== ID;
-				});
-				_this3.trigger('updateHorizontals', state.horizontals);
+			var index;
+			state.horizontals.forEach(function (horizontal, i) {
+				if (horizontal.id == ID) {
+					index = i;
+				}
 			});
+			state.horizontals.splice(index, 1);
+			this.trigger('updateHorizontals', state.horizontals);
 		}
 	});
 
@@ -61594,36 +61595,29 @@
 		listenables: [_actions2.default],
 
 		getVerticals: function getVerticals() {
-			var _this4 = this;
-
-			_api2.default.getVerticals().end(function (err, response) {
-				state.verticals = JSON.parse(response.text);
-				_this4.trigger('getVerticals', state.verticals);
-			});
+			this.trigger('getVerticals', state.verticals);
 		},
 		removeVertical: function removeVertical(ID) {
-			var _this5 = this;
-
-			_api2.default.removeVertical(ID).end(function (err, response) {
-				state.verticals = state.verticals.filter(function (vertical) {
-					return vertical.id !== ID;
-				});
-				_this5.trigger('updateVerticals', state.verticals);
+			var index;
+			state.verticals.forEach(function (vertical, i) {
+				if (vertical.id == ID) {
+					index = i;
+				}
 			});
+			state.verticals.splice(index, 1);
+			this.trigger('updateVerticals', state.verticals);
 		},
 		updateVertical: function updateVertical(ID, data) {
-			_api2.default.updateVertical(ID, data).end(function (err, response) {
-				// console.log(response)
-			});
+			// var vertical = state.verticals.filter(vertical => vertical.id === ID)[0]
+			// console.log(vertical)
+			// for (var prop in data) {
+			// 	console.log(data[prop])
+			// }
 		},
 		createVertical: function createVertical(data) {
-			var _this6 = this;
-
-			_api2.default.createVertical(data).end(function (err, response) {
-				var newVertical = JSON.parse(response.text);
-				state.verticals.push(newVertical);
-				_this6.trigger('updateVerticals', state.verticals);
-			});
+			data.id = _uuid2.default.v1();
+			state.verticals.push(data);
+			this.trigger('updateVerticals', state.verticals);
 		}
 	});
 
@@ -61635,37 +61629,30 @@
 		listenables: [_actions2.default],
 
 		getNotes: function getNotes() {
-			var _this7 = this;
-
-			_api2.default.getNotes().end(function (err, response) {
-				state.notes = JSON.parse(response.text);
-				_this7.trigger('getNotes', state.notes);
-			});
+			this.trigger('getNotes', state.notes);
 		},
 		createNote: function createNote(data) {
-			var _this8 = this;
-
-			_api2.default.createNote(data).end(function (err, response) {
-				var newNote = JSON.parse(response.text);
-				state.notes.push(newNote);
-				_this8.trigger('updateNotes', state.notes);
-			});
+			data.id = _uuid2.default.v1();
+			state.notes.push(data);
+			this.trigger('updateNotes', state.notes);
 		},
 		removeNote: function removeNote(ID) {
-			var _this9 = this;
-
-			_api2.default.removeNote(ID).end(function (err, response) {
-				state.notes = state.notes.filter(function (note) {
-					return note.id !== ID;
-				});
-				_this9.trigger('updateNotes', state.notes);
+			var index;
+			state.notes.forEach(function (note, i) {
+				if (note.id == ID) {
+					index = i;
+				}
 			});
+			state.notes.splice(index, 1);
+			this.trigger('updateNotes', state.notes);
 		},
 		updateNote: function updateNote(ID, data) {
-			console.log(ID, data);
-			_api2.default.updateNote(ID, data).end(function (err, response) {
-				// console.log(response)
-			});
+			// API.updateNote(ID, data)
+			// 	.end(
+			// 		(err, response) => {
+			// 			// console.log(response)
+			// 		}
+			// 	)
 		}
 	});
 
@@ -63266,6 +63253,233 @@
 /* 499 */
 /***/ function(module, exports, __webpack_require__) {
 
+	//     uuid.js
+	//
+	//     Copyright (c) 2010-2012 Robert Kieffer
+	//     MIT License - http://opensource.org/licenses/mit-license.php
+
+	// Unique ID creation requires a high quality random # generator.  We feature
+	// detect to determine the best RNG source, normalizing to a function that
+	// returns 128-bits of randomness, since that's what's usually required
+	var _rng = __webpack_require__(500);
+
+	// Maps for number <-> hex string conversion
+	var _byteToHex = [];
+	var _hexToByte = {};
+	for (var i = 0; i < 256; i++) {
+	  _byteToHex[i] = (i + 0x100).toString(16).substr(1);
+	  _hexToByte[_byteToHex[i]] = i;
+	}
+
+	// **`parse()` - Parse a UUID into it's component bytes**
+	function parse(s, buf, offset) {
+	  var i = (buf && offset) || 0, ii = 0;
+
+	  buf = buf || [];
+	  s.toLowerCase().replace(/[0-9a-f]{2}/g, function(oct) {
+	    if (ii < 16) { // Don't overflow!
+	      buf[i + ii++] = _hexToByte[oct];
+	    }
+	  });
+
+	  // Zero out remaining bytes if string was short
+	  while (ii < 16) {
+	    buf[i + ii++] = 0;
+	  }
+
+	  return buf;
+	}
+
+	// **`unparse()` - Convert UUID byte array (ala parse()) into a string**
+	function unparse(buf, offset) {
+	  var i = offset || 0, bth = _byteToHex;
+	  return  bth[buf[i++]] + bth[buf[i++]] +
+	          bth[buf[i++]] + bth[buf[i++]] + '-' +
+	          bth[buf[i++]] + bth[buf[i++]] + '-' +
+	          bth[buf[i++]] + bth[buf[i++]] + '-' +
+	          bth[buf[i++]] + bth[buf[i++]] + '-' +
+	          bth[buf[i++]] + bth[buf[i++]] +
+	          bth[buf[i++]] + bth[buf[i++]] +
+	          bth[buf[i++]] + bth[buf[i++]];
+	}
+
+	// **`v1()` - Generate time-based UUID**
+	//
+	// Inspired by https://github.com/LiosK/UUID.js
+	// and http://docs.python.org/library/uuid.html
+
+	// random #'s we need to init node and clockseq
+	var _seedBytes = _rng();
+
+	// Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+	var _nodeId = [
+	  _seedBytes[0] | 0x01,
+	  _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]
+	];
+
+	// Per 4.2.2, randomize (14 bit) clockseq
+	var _clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
+
+	// Previous uuid creation time
+	var _lastMSecs = 0, _lastNSecs = 0;
+
+	// See https://github.com/broofa/node-uuid for API details
+	function v1(options, buf, offset) {
+	  var i = buf && offset || 0;
+	  var b = buf || [];
+
+	  options = options || {};
+
+	  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
+
+	  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+	  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+	  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+	  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+	  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
+
+	  // Per 4.2.1.2, use count of uuid's generated during the current clock
+	  // cycle to simulate higher resolution clock
+	  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
+
+	  // Time since last uuid creation (in msecs)
+	  var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
+
+	  // Per 4.2.1.2, Bump clockseq on clock regression
+	  if (dt < 0 && options.clockseq === undefined) {
+	    clockseq = clockseq + 1 & 0x3fff;
+	  }
+
+	  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+	  // time interval
+	  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
+	    nsecs = 0;
+	  }
+
+	  // Per 4.2.1.2 Throw error if too many uuids are requested
+	  if (nsecs >= 10000) {
+	    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+	  }
+
+	  _lastMSecs = msecs;
+	  _lastNSecs = nsecs;
+	  _clockseq = clockseq;
+
+	  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+	  msecs += 12219292800000;
+
+	  // `time_low`
+	  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+	  b[i++] = tl >>> 24 & 0xff;
+	  b[i++] = tl >>> 16 & 0xff;
+	  b[i++] = tl >>> 8 & 0xff;
+	  b[i++] = tl & 0xff;
+
+	  // `time_mid`
+	  var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
+	  b[i++] = tmh >>> 8 & 0xff;
+	  b[i++] = tmh & 0xff;
+
+	  // `time_high_and_version`
+	  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+	  b[i++] = tmh >>> 16 & 0xff;
+
+	  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+	  b[i++] = clockseq >>> 8 | 0x80;
+
+	  // `clock_seq_low`
+	  b[i++] = clockseq & 0xff;
+
+	  // `node`
+	  var node = options.node || _nodeId;
+	  for (var n = 0; n < 6; n++) {
+	    b[i + n] = node[n];
+	  }
+
+	  return buf ? buf : unparse(b);
+	}
+
+	// **`v4()` - Generate random UUID**
+
+	// See https://github.com/broofa/node-uuid for API details
+	function v4(options, buf, offset) {
+	  // Deprecated - 'format' argument, as supported in v1.2
+	  var i = buf && offset || 0;
+
+	  if (typeof(options) == 'string') {
+	    buf = options == 'binary' ? new Array(16) : null;
+	    options = null;
+	  }
+	  options = options || {};
+
+	  var rnds = options.random || (options.rng || _rng)();
+
+	  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+	  rnds[6] = (rnds[6] & 0x0f) | 0x40;
+	  rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+	  // Copy bytes to buffer, if provided
+	  if (buf) {
+	    for (var ii = 0; ii < 16; ii++) {
+	      buf[i + ii] = rnds[ii];
+	    }
+	  }
+
+	  return buf || unparse(rnds);
+	}
+
+	// Export public API
+	var uuid = v4;
+	uuid.v1 = v1;
+	uuid.v4 = v4;
+	uuid.parse = parse;
+	uuid.unparse = unparse;
+
+	module.exports = uuid;
+
+
+/***/ },
+/* 500 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {
+	var rng;
+
+	if (global.crypto && crypto.getRandomValues) {
+	  // WHATWG crypto-based RNG - http://wiki.whatwg.org/wiki/Crypto
+	  // Moderately fast, high quality
+	  var _rnds8 = new Uint8Array(16);
+	  rng = function whatwgRNG() {
+	    crypto.getRandomValues(_rnds8);
+	    return _rnds8;
+	  };
+	}
+
+	if (!rng) {
+	  // Math.random()-based (RNG)
+	  //
+	  // If all else fails, use Math.random().  It's fast, but is of unspecified
+	  // quality.
+	  var  _rnds = new Array(16);
+	  rng = function() {
+	    for (var i = 0, r; i < 16; i++) {
+	      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
+	      _rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+	    }
+
+	    return _rnds;
+	  };
+	}
+
+	module.exports = rng;
+
+
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 501 */
+/***/ function(module, exports, __webpack_require__) {
+
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -63286,7 +63500,7 @@
 
 	var _actions2 = _interopRequireDefault(_actions);
 
-	var _index = __webpack_require__(500);
+	var _index = __webpack_require__(502);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -63480,7 +63694,7 @@
 	exports.default = Vertical;
 
 /***/ },
-/* 500 */
+/* 502 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -63503,7 +63717,7 @@
 
 	var _reactBootstrap = __webpack_require__(178);
 
-	var _index = __webpack_require__(501);
+	var _index = __webpack_require__(503);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -63746,6 +63960,11 @@
 			value: function componentDidMount() {
 				window.dragula.containers.push(_reactDom2.default.findDOMNode(this.refs.ListGroup));
 			}
+		}, {
+			key: 'componentDidUpdate',
+			value: function componentDidUpdate() {
+				window.dragula.containers.push(_reactDom2.default.findDOMNode(this.refs.ListGroup));
+			}
 		}]);
 
 		return Horizontal;
@@ -63754,7 +63973,7 @@
 	exports.default = Horizontal;
 
 /***/ },
-/* 501 */
+/* 503 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -63921,16 +64140,16 @@
 	exports.default = Note;
 
 /***/ },
-/* 502 */
+/* 504 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(503);
+	var content = __webpack_require__(505);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(505)(content, {});
+	var update = __webpack_require__(507)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -63947,10 +64166,10 @@
 	}
 
 /***/ },
-/* 503 */
+/* 505 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(504)();
+	exports = module.exports = __webpack_require__(506)();
 	// imports
 
 
@@ -63961,7 +64180,7 @@
 
 
 /***/ },
-/* 504 */
+/* 506 */
 /***/ function(module, exports) {
 
 	/*
@@ -64017,7 +64236,7 @@
 
 
 /***/ },
-/* 505 */
+/* 507 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -64271,16 +64490,16 @@
 
 
 /***/ },
-/* 506 */
+/* 508 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(507);
+	var content = __webpack_require__(509);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(505)(content, {});
+	var update = __webpack_require__(507)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -64297,10 +64516,10 @@
 	}
 
 /***/ },
-/* 507 */
+/* 509 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(504)();
+	exports = module.exports = __webpack_require__(506)();
 	// imports
 
 

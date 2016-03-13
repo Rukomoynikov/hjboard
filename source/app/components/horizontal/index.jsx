@@ -147,5 +147,9 @@ export default class Horizontal extends React.Component {
 	componentDidMount () {
 		window.dragula.containers.push(ReactDOM.findDOMNode(this.refs.ListGroup))
 	}
+	
+	componentDidUpdate () {
+		window.dragula.containers.push(ReactDOM.findDOMNode(this.refs.ListGroup))
+	}
 
 }
