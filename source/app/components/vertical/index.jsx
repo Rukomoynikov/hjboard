@@ -69,7 +69,7 @@ export default class Vertical extends React.Component {
 					note => note.horizontal === horizontal.id
 				)
 				return (
-					<Horizontal {...horizontal} key={horizontal.id} notes={notes}/>
+					<Horizontal {...horizontal} key={horizontal.id} notes={notes} vertical={this.props.id} />
 				)
 			}
 		)

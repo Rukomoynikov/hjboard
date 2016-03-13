@@ -11,6 +11,7 @@ export default class Horizontal extends React.Component {
 			title : props.title,
 			notes : props.notes,
 			showModal : false,
+			creatingNote : false,
 			editing: false
 		}
 	}
@@ -64,7 +65,22 @@ export default class Horizontal extends React.Component {
 						)
 					}
 				)}
-				<ListGroupItem>Добавить</ListGroupItem>
+					{
+						this.state.creatingNote ?
+						(<div style={{textAlign: "center", marginTop : "10px"}} className='buttonAddNote'>
+							<input
+								className='form-control leftInput newNoteInput'
+								type='text'
+								value={this.state.newNoteTitle}
+								ref="input"
+								onChange={ event => this.setState({newNoteTitle : event.target.value}) }
+							/>
+							<Button bsStyle="success" onClick={event => this.createNote()}><Glyphicon glyph="ok" /></Button>
+						</div>)
+						:
+						(<Button bsStyle="success" onClick={event => this.setState({creatingNote : true})}><Glyphicon glyph="plus" />Добавить</Button>)
+					}
+
 			</ListGroup>
 		)
 	}
@@ -106,5 +122,15 @@ export default class Horizontal extends React.Component {
 	removeHorizontal () {
 		this.setState({showModal: false})
 		Actions.removeHorizontal(this.props.id)
+	}
+
+	createNote () {
+		this.setState({creatingNote: false})
+		var newNote = {
+			title : this.state.newNoteTitle,
+			vertical : this.props.vertical,
+			horizontal : this.props.id
+		};
+		Actions.createNote(newNote);
 	}
 }

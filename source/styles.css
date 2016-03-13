@@ -34,3 +34,30 @@
 	vertical-align: middle;
 	margin-right: 5px;
 }
+
+.newNoteInput {
+	width : calc(100% - 45px);
+}
+
+.buttonAddNote {
+	visibility: hidden;
+}
+
+.horizontal:hover .buttonAddNote {
+	visibility: visible;
+}
+
+.note {
+	position: relative;
+}
+
+.removeNoteButton {
+	position: absolute;
+	top: 5px;
+	right: 10px;
+	visibility: hidden;
+}
+
+.note:hover .removeNoteButton {
+	visibility: visible;
+}

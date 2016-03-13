@@ -90,10 +90,6 @@ export const VerticalsStore = Reflux.createStore({
 					this.trigger('updateVerticals', state.verticals);
 				}
 			)
-	},
-
-	removeHorizontal () {
-
 	}
 })
 
@@ -110,5 +106,36 @@ export const NotesStore = Reflux.createStore({
 				state.notes = JSON.parse(response.text);
 				this.trigger('getNotes', state.notes)
 			})
+	},
+
+	createNote (data) {
+		API.createNote(data)
+			.end(
+				(err, response) => {
+					var newNote = JSON.parse(response.text);
+					state.notes.push(newNote);
+					this.trigger('updateNotes', state.notes);
+				}
+			)
+	},
+
+	removeNote (ID) {
+		API.removeNote(ID)
+			.end(
+				(err, response) => {
+					state.notes = state.notes.filter(note => note.id !== ID);
+					this.trigger('updateNotes', state.notes);
+				}
+			)
+	},
+
+	updateNote (ID, data) {
+		API.updateNote(ID, data)
+			.end(
+				(err, response) => {
+					// console.log(response)
+				}
+			)
 	}
+
 })

@@ -61594,8 +61594,7 @@
 				state.verticals.push(newVertical);
 				_this6.trigger('updateVerticals', state.verticals);
 			});
-		},
-		removeHorizontal: function removeHorizontal() {}
+		}
 	});
 
 	// 'removeNote',
@@ -61611,6 +61610,30 @@
 			_api2.default.getNotes().end(function (err, response) {
 				state.notes = JSON.parse(response.text);
 				_this7.trigger('getNotes', state.notes);
+			});
+		},
+		createNote: function createNote(data) {
+			var _this8 = this;
+
+			_api2.default.createNote(data).end(function (err, response) {
+				var newNote = JSON.parse(response.text);
+				state.notes.push(newNote);
+				_this8.trigger('updateNotes', state.notes);
+			});
+		},
+		removeNote: function removeNote(ID) {
+			var _this9 = this;
+
+			_api2.default.removeNote(ID).end(function (err, response) {
+				state.notes = state.notes.filter(function (note) {
+					return note.id !== ID;
+				});
+				_this9.trigger('updateNotes', state.notes);
+			});
+		},
+		updateNote: function updateNote(ID, data) {
+			_api2.default.updateNote(ID, data).end(function (err, response) {
+				// console.log(response)
 			});
 		}
 	});
@@ -61663,6 +61686,10 @@
 		return _superagent2.default.delete('/horizontals/' + ID);
 	};
 
+	var removeNote = function removeNote(ID) {
+		return _superagent2.default.delete('/notes/' + ID);
+	};
+
 	var updateVertical = function updateVertical(ID, data) {
 		return _superagent2.default.put('/api/verticals/' + ID).send(data).set('Accept', 'application/json');
 	};
@@ -61687,6 +61714,10 @@
 		return _superagent2.default.get('/notes');
 	};
 
+	var createNote = function createNote(data) {
+		return _superagent2.default.post('/notes/').send(data).set('Accept', 'application/json');
+	};
+
 	var API = {
 		getVerticals: getVerticals,
 		getHorizontals: getHorizontals,
@@ -61696,7 +61727,9 @@
 		createVertical: createVertical,
 		createHorizontal: createHorizontal,
 		updateHorizontal: updateHorizontal,
-		removeHorizontal: removeHorizontal
+		removeHorizontal: removeHorizontal,
+		createNote: createNote,
+		removeNote: removeNote
 	};
 
 	exports.default = API;
@@ -63339,7 +63372,7 @@
 					var notes = _this3.state.notes.filter(function (note) {
 						return note.horizontal === horizontal.id;
 					});
-					return _react2.default.createElement(_index2.default, _extends({}, horizontal, { key: horizontal.id, notes: notes }));
+					return _react2.default.createElement(_index2.default, _extends({}, horizontal, { key: horizontal.id, notes: notes, vertical: _this3.props.id }));
 				});
 			}
 		}, {
@@ -63470,6 +63503,7 @@
 				title: props.title,
 				notes: props.notes,
 				showModal: false,
+				creatingNote: false,
 				editing: false
 			};
 			return _this;
@@ -63545,15 +63579,39 @@
 		}, {
 			key: 'renderNotes',
 			value: function renderNotes() {
+				var _this3 = this;
+
 				return _react2.default.createElement(
 					_reactBootstrap.ListGroup,
 					null,
 					this.state.notes.map(function (note) {
 						return _react2.default.createElement(_index2.default, _extends({}, note, { key: note.title }));
 					}),
-					_react2.default.createElement(
-						_reactBootstrap.ListGroupItem,
-						null,
+					this.state.creatingNote ? _react2.default.createElement(
+						'div',
+						{ style: { textAlign: "center", marginTop: "10px" }, className: 'buttonAddNote' },
+						_react2.default.createElement('input', {
+							className: 'form-control leftInput newNoteInput',
+							type: 'text',
+							value: this.state.newNoteTitle,
+							ref: 'input',
+							onChange: function onChange(event) {
+								return _this3.setState({ newNoteTitle: event.target.value });
+							}
+						}),
+						_react2.default.createElement(
+							_reactBootstrap.Button,
+							{ bsStyle: 'success', onClick: function onClick(event) {
+									return _this3.createNote();
+								} },
+							_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'ok' })
+						)
+					) : _react2.default.createElement(
+						_reactBootstrap.Button,
+						{ bsStyle: 'success', onClick: function onClick(event) {
+								return _this3.setState({ creatingNote: true });
+							} },
+						_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'plus' }),
 						'Добавить'
 					)
 				);
@@ -63561,7 +63619,7 @@
 		}, {
 			key: 'renderModal',
 			value: function renderModal() {
-				var _this3 = this;
+				var _this4 = this;
 
 				return _react2.default.createElement(
 					_reactBootstrap.Modal,
@@ -63593,7 +63651,7 @@
 						_react2.default.createElement(
 							_reactBootstrap.Button,
 							{ onClick: function onClick(event) {
-									return _this3.removeHorizontal();
+									return _this4.removeHorizontal();
 								} },
 							'Yes'
 						)
@@ -63626,6 +63684,17 @@
 				this.setState({ showModal: false });
 				_actions2.default.removeHorizontal(this.props.id);
 			}
+		}, {
+			key: 'createNote',
+			value: function createNote() {
+				this.setState({ creatingNote: false });
+				var newNote = {
+					title: this.state.newNoteTitle,
+					vertical: this.props.vertical,
+					horizontal: this.props.id
+				};
+				_actions2.default.createNote(newNote);
+			}
 		}]);
 
 		return Horizontal;
@@ -63651,6 +63720,10 @@
 
 	var _reactBootstrap = __webpack_require__(178);
 
+	var _actions = __webpack_require__(490);
+
+	var _actions2 = _interopRequireDefault(_actions);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -63668,7 +63741,9 @@
 			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Note).call(this, props));
 
 			_this.state = {
-				title: props.title
+				title: props.title,
+				editing: false,
+				showModal: false
 			};
 			return _this;
 		}
@@ -63676,11 +63751,92 @@
 		_createClass(Note, [{
 			key: 'render',
 			value: function render() {
+				var _this2 = this;
+
+				if (this.state.editing) {
+					return _react2.default.createElement('input', {
+						className: 'form-control leftInput newNoteInput',
+						type: 'text',
+						value: this.state.title,
+						ref: 'input',
+						onChange: function onChange(event) {
+							return _this2.setState({ title: event.target.value });
+						}
+					});
+				} else {
+					return _react2.default.createElement(
+						'div',
+						{ className: 'note' },
+						_react2.default.createElement(
+							_reactBootstrap.ListGroupItem,
+							{ key: this.state.title, onClick: function onClick(event) {
+									return _this2.setState({ editing: true });
+								} },
+							this.state.title
+						),
+						_react2.default.createElement(
+							_reactBootstrap.Button,
+							{ bsSize: 'xsmall', className: 'removeNoteButton', onClick: function onClick(event) {
+									return _this2.setState({ showModal: true });
+								} },
+							_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'remove' })
+						),
+						this.state.showModal ? this.renderModal() : null
+					);
+				}
+			}
+		}, {
+			key: 'renderModal',
+			value: function renderModal() {
+				var _this3 = this;
+
 				return _react2.default.createElement(
-					_reactBootstrap.ListGroupItem,
-					{ key: this.state.title },
-					this.state.title
+					_reactBootstrap.Modal,
+					{ show: this.state.showModal, onHide: this.close },
+					_react2.default.createElement(
+						_reactBootstrap.Modal.Header,
+						{ closeButton: true },
+						_react2.default.createElement(
+							_reactBootstrap.Modal.Title,
+							null,
+							'Remove note "',
+							this.state.title,
+							'" ? '
+						)
+					),
+					_react2.default.createElement(
+						_reactBootstrap.Modal.Footer,
+						null,
+						_react2.default.createElement(
+							_reactBootstrap.Button,
+							{ onClick: this.close },
+							'No'
+						),
+						_react2.default.createElement(
+							_reactBootstrap.Button,
+							{ onClick: function onClick(event) {
+									return _this3.removeNote();
+								} },
+							'Yes'
+						)
+					)
 				);
+			}
+		}, {
+			key: 'close',
+			value: function close() {
+				this.setState({ showModal: false });
+			}
+		}, {
+			key: 'open',
+			value: function open() {
+				this.setState({ showModal: true });
+			}
+		}, {
+			key: 'removeNote',
+			value: function removeNote() {
+				this.setState({ showModal: false });
+				_actions2.default.removeNote(this.props.id);
 			}
 		}]);
 
@@ -63724,7 +63880,7 @@
 
 
 	// module
-	exports.push([module.id, "#app {\n\tpadding: 0px 20px;\n}\n.vertical {\n\tbackground: #E3E0E2;\n\tmargin-right: 20px;\n}\n\n.btn-group {\n\tvisibility: hidden;\n}\n\n.vertical:hover > h2 > .btn-group {\n\tvisibility: visible;\n}\n\n.horizontal:hover  .btn-group {\n\tvisibility: visible;\n}\n\n.horizontal {\n\tbackground: #c7c7c7;\n\tmargin: 0px 0px 20px 0px;\n\tborder-radius: 20px;\n}\n\n.edit-panel {\n\tmargin-left: 5px;\n}\n\n.leftInput {\n\tdisplay: inline-block;\n\twidth: auto;\n\tvertical-align: middle;\n\tmargin-right: 5px;\n}\n", ""]);
+	exports.push([module.id, "#app {\n\tpadding: 0px 20px;\n}\n.vertical {\n\tbackground: #E3E0E2;\n\tmargin-right: 20px;\n}\n\n.btn-group {\n\tvisibility: hidden;\n}\n\n.vertical:hover > h2 > .btn-group {\n\tvisibility: visible;\n}\n\n.horizontal:hover  .btn-group {\n\tvisibility: visible;\n}\n\n.horizontal {\n\tbackground: #c7c7c7;\n\tmargin: 0px 0px 20px 0px;\n\tborder-radius: 20px;\n}\n\n.edit-panel {\n\tmargin-left: 5px;\n}\n\n.leftInput {\n\tdisplay: inline-block;\n\twidth: auto;\n\tvertical-align: middle;\n\tmargin-right: 5px;\n}\n\n.newNoteInput {\n\twidth : calc(100% - 45px);\n}\n\n.buttonAddNote {\n\tvisibility: hidden;\n}\n\n.horizontal:hover .buttonAddNote {\n\tvisibility: visible;\n}\n\n.note {\n\tposition: relative;\n}\n\n.removeNoteButton {\n\tposition: absolute;\n\ttop: 5px;\n\tright: 10px;\n\tvisibility: hidden;\n}\n\n.note:hover .removeNoteButton {\n\tvisibility: visible;\n}", ""]);
 
 	// exports
 
