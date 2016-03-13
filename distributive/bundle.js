@@ -126,10 +126,16 @@
 				}
 			});
 			_stores.HorizontalsStore.listen(function (eventName, data) {
-				console.log(eventName, data);
 				if (eventName === 'updateHorizontals') {
 					_this.setState({
-						horinzontals: data
+						horizontals: data
+					});
+				}
+			});
+			_stores.NotesStore.listen(function (eventName, data) {
+				if (eventName === 'updateNotes') {
+					_this.setState({
+						notes: data
 					});
 				}
 			});
@@ -61718,6 +61724,10 @@
 		return _superagent2.default.post('/notes/').send(data).set('Accept', 'application/json');
 	};
 
+	var updateNote = function updateNote(ID, data) {
+		return _superagent2.default.put('/notes/' + ID).send(data).set('Accept', 'application/json');
+	};
+
 	var API = {
 		getVerticals: getVerticals,
 		getHorizontals: getHorizontals,
@@ -61729,7 +61739,8 @@
 		updateHorizontal: updateHorizontal,
 		removeHorizontal: removeHorizontal,
 		createNote: createNote,
-		removeNote: removeNote
+		removeNote: removeNote,
+		updateNote: updateNote
 	};
 
 	exports.default = API;
@@ -63287,8 +63298,10 @@
 		_createClass(Vertical, [{
 			key: 'componentWillReceiveProps',
 			value: function componentWillReceiveProps(newProps) {
+				console.log(newProps);
 				this.setState({
-					horizontals: newProps.horizontals
+					horizontals: newProps.horizontals,
+					notes: newProps.notes
 				});
 			}
 		}, {
@@ -63754,15 +63767,26 @@
 				var _this2 = this;
 
 				if (this.state.editing) {
-					return _react2.default.createElement('input', {
-						className: 'form-control leftInput newNoteInput',
-						type: 'text',
-						value: this.state.title,
-						ref: 'input',
-						onChange: function onChange(event) {
-							return _this2.setState({ title: event.target.value });
-						}
-					});
+					return _react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement('input', {
+							className: 'form-control leftInput newNoteInput',
+							type: 'text',
+							value: this.state.title,
+							ref: 'input',
+							onChange: function onChange(event) {
+								return _this2.setState({ title: event.target.value });
+							}
+						}),
+						_react2.default.createElement(
+							_reactBootstrap.Button,
+							{ bsStyle: 'success', onClick: function onClick(event) {
+									return _this2.updateNote();
+								} },
+							_react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'ok' })
+						)
+					);
 				} else {
 					return _react2.default.createElement(
 						'div',
@@ -63837,6 +63861,19 @@
 			value: function removeNote() {
 				this.setState({ showModal: false });
 				_actions2.default.removeNote(this.props.id);
+			}
+		}, {
+			key: 'updateNote',
+			value: function updateNote() {
+				this.setState({
+					editing: false
+				});
+				var updatedNote = {
+					title: this.state.title,
+					vertical: this.props.vertical,
+					horizontal: this.props.horizontal
+				};
+				_actions2.default.updateNote(this.props.id, updatedNote);
 			}
 		}]);
 

@@ -42,10 +42,18 @@ export default class Main extends React.Component {
 		);
 		HorizontalsStore.listen(
 			(eventName, data) => {
-				console.log(eventName, data);
 				if(eventName === 'updateHorizontals') {
 					this.setState({
-						horinzontals : data
+						horizontals : data
+					})
+				}
+			}
+		);
+		NotesStore.listen(
+			(eventName, data) => {
+				if(eventName === 'updateNotes') {
+					this.setState({
+						notes : data
 					})
 				}
 			}

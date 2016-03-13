@@ -65,6 +65,13 @@ const createNote = (data) => {
 		.set('Accept', 'application/json')
 }
 
+const updateNote = (ID, data) => {
+	return request
+		.put('/notes/' + ID)
+		.send(data)
+		.set('Accept', 'application/json')
+}
+
 const API = {
 	getVerticals : getVerticals,
 	getHorizontals : getHorizontals,
@@ -76,7 +83,8 @@ const API = {
 	updateHorizontal : updateHorizontal,
 	removeHorizontal : removeHorizontal,
 	createNote : createNote,
-	removeNote : removeNote
+	removeNote : removeNote,
+	updateNote : updateNote
 }
 
 export default API
