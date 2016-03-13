@@ -28,8 +28,8 @@ export default class Note extends React.Component {
 					</div>
 					)
 		} else {
-			return (<div className='note'>
-				<ListGroupItem key={this.state.title} onClick={event => this.setState({editing: true})}>
+			return (<div className='note' data-note-id={this.props.id}>
+				<ListGroupItem key={this.state.title} onClick={event => this.setState({editing: true})} >
 					{this.state.title}
 				</ListGroupItem>
 				<Button bsSize="xsmall" className='removeNoteButton' onClick={event => this.setState({showModal : true})}><Glyphicon glyph="remove" /></Button>
@@ -68,7 +68,7 @@ export default class Note extends React.Component {
 
 	updateNote () {
 		this.setState({
-			editing : false			
+			editing : false
 		})
 		var updatedNote = {
 			title : this.state.title,
