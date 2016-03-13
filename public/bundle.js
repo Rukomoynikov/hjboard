@@ -255,9 +255,9 @@
 					var updatedNote = _this4.state.notes.filter(function (note) {
 						return note.id == el.dataset.noteId;
 					})[0];
-					updatedNote.vertical = Number(target.parentElement.parentElement.parentElement.dataset.verticalId);
-					updatedNote.horizontal = Number(target.parentElement.parentElement.parentElement.dataset.horizontalId);
-					_actions2.default.updateNote(Number(el.dataset.noteId), updatedNote);
+					updatedNote.vertical = target.parentElement.parentElement.parentElement.dataset.verticalId;
+					updatedNote.horizontal = target.parentElement.parentElement.parentElement.dataset.horizontalId;
+					_actions2.default.updateNote(el.dataset.noteId, updatedNote);
 				});
 			}
 		}]);

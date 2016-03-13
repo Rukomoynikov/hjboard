@@ -140,9 +140,9 @@ export default class Main extends React.Component {
 		});
 		window.dragula.on('drop' , (el, target, source, sibling) => {
 			var updatedNote = this.state.notes.filter(note => note.id == el.dataset.noteId)[0];
-			updatedNote.vertical = Number(target.parentElement.parentElement.parentElement.dataset.verticalId);
-			updatedNote.horizontal = Number(target.parentElement.parentElement.parentElement.dataset.horizontalId);
-			Actions.updateNote(Number(el.dataset.noteId), updatedNote)
+			updatedNote.vertical = target.parentElement.parentElement.parentElement.dataset.verticalId;
+			updatedNote.horizontal = target.parentElement.parentElement.parentElement.dataset.horizontalId;
+			Actions.updateNote(el.dataset.noteId, updatedNote)
 		})
 	}
 
