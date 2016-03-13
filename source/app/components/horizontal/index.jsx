@@ -13,7 +13,8 @@ export default class Horizontal extends React.Component {
 			notes : props.notes,
 			showModal : false,
 			creatingNote : false,
-			editing: false
+			editing: false,
+			newNoteTitle : ""
 		}
 	}
 
@@ -80,7 +81,7 @@ export default class Horizontal extends React.Component {
 								className='form-control leftInput newNoteInput'
 								type='text'
 								value={this.state.newNoteTitle}
-								ref="input"
+								ref="noteInput"
 								onChange={ event => this.setState({newNoteTitle : event.target.value}) }
 							/>
 							<Button bsStyle="success" onClick={event => this.createNote()}><Glyphicon glyph="ok" /></Button>
@@ -147,9 +148,16 @@ export default class Horizontal extends React.Component {
 	componentDidMount () {
 		window.dragula.containers.push(ReactDOM.findDOMNode(this.refs.ListGroup))
 	}
-	
+
 	componentDidUpdate () {
 		window.dragula.containers.push(ReactDOM.findDOMNode(this.refs.ListGroup))
+		if (this.refs.input) {
+			this.refs.input.focus();
+			this.refs.input.selectionStart = this.state.title ? this.state.title.length : 0;
+		} else if (this.refs.noteInput) {
+			this.refs.noteInput.focus();
+			this.refs.noteInput.selectionStart = this.state.newNoteTitle.length;
+		}
 	}
 
 }
