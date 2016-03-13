@@ -124,6 +124,21 @@ export default class Main extends React.Component {
 		Actions.createVertical(data)
 	}
 
+	componentDidMount () {
+		window.dragula = dragula([], {
+			moves: function (el, source, handle, sibling) {
+				console.log(el, source, sibling)
+				return true; // elements are always draggable by default
+			},
+			accepts: function (el, target, source, sibling) {
+				console.log(el, source, sibling)
+				return true; // elements can be dropped in any of the `containers` by default
+			}
+		});
+		// var arr = document.querySelectorAll('.list-group');
+		// var arr2 = []; for (var i = 0; arr.length > i; i++) {arr2.push(arr[i])}
+	}
+
 }
 
 ReactDOM.render(<Main />, document.querySelector('#app'))

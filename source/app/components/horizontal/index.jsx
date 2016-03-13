@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import {Row, Col, Glyphicon, ButtonGroup, Button, ListGroup, ListGroupItem, Modal} from 'react-bootstrap';
 
 import Note from '../note/index.jsx';
@@ -57,7 +58,7 @@ export default class Horizontal extends React.Component {
 
 	renderNotes () {
 		return (
-			<ListGroup>
+			<ListGroup ref={'ListGroup'}>
 				{this.state.notes.map(
 					(note) => {
 						return (
@@ -133,4 +134,10 @@ export default class Horizontal extends React.Component {
 		};
 		Actions.createNote(newNote);
 	}
+
+	componentDidMount () {
+		window.dragula.containers.push(ReactDOM.findDOMNode(this.refs.ListGroup))
+		// dragula([])
+	}
+
 }
