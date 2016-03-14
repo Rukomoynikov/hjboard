@@ -32,7 +32,6 @@ export default class Main extends React.Component {
 		VerticalsStore.listen(
 			(eventName, data) => {
 				if(eventName === 'updateVerticals') {
-					console.log(data)
 					this.setState({
 						verticals : data,
 						creatingNew : false
