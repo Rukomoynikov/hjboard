@@ -1,6 +1,7 @@
 import React from 'react';
 import {Col, Glyphicon, ButtonGroup, Button, Input, Modal} from 'react-bootstrap';
 import ColorPicker from 'react-color';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import Actions from '../../flux/actions.jsx'
 import Horizontal from '../horizontal/index.jsx';
@@ -44,7 +45,9 @@ export default class Vertical extends React.Component {
 						<Button bsStyle="success" onClick={event => this.updateVertical() }><Glyphicon glyph="ok" /></Button>
 					</h2>
 					{this.state.renderModal ? this.renderModal() : null}
-					{this.renderHorizontals()}
+					<ReactCSSTransitionGroup transitionName="example" transitionEnterTimeout={500} transitionLeaveTimeout={300}>
+						{this.renderHorizontals()}
+					</ReactCSSTransitionGroup>
 				</Col>
 			)
 		} else {
@@ -62,7 +65,9 @@ export default class Vertical extends React.Component {
 					</h2>
 					{this.state.showColorPicker ? <ColorPicker color={ this.state.backgroundColor } type="compact" onChange={ this.changeBackground.bind(this) } /> : null}
 					{this.renderModal()}
-					{this.renderHorizontals()}
+					<ReactCSSTransitionGroup transitionName="example" transitionEnterTimeout={500} transitionLeaveTimeout={300}>
+						{this.renderHorizontals()}
+					</ReactCSSTransitionGroup>
 				</Col>
 			)
 		}

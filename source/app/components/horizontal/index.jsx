@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Row, Col, Glyphicon, ButtonGroup, Button, ListGroup, ListGroupItem, Modal} from 'react-bootstrap';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import Note from '../note/index.jsx';
 import Actions from '../../flux/actions.jsx'
@@ -66,6 +67,7 @@ export default class Horizontal extends React.Component {
 	renderNotes () {
 		return (
 			<div><ListGroup ref={'ListGroup'}>
+				<ReactCSSTransitionGroup transitionName="example" transitionEnterTimeout={500} transitionLeaveTimeout={300}>
 				{this.state.notes.map(
 					(note) => {
 						return (
@@ -73,6 +75,7 @@ export default class Horizontal extends React.Component {
 						)
 					}
 				)}
+				</ReactCSSTransitionGroup>
 				</ListGroup>
 					{
 						this.state.creatingNote ?
