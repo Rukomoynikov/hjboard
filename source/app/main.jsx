@@ -4,6 +4,7 @@ import Reflux from 'reflux';
 
 import {Grid, Row, Col, ListGroup, ListGroupItem, Glyphicon, ButtonGroup, Button} from 'react-bootstrap';
 import dragula from 'react-dragula';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import {HorizontalsStore, VerticalsStore, NotesStore} from './flux/stores.jsx';
 import Actions from './flux/actions.jsx';
@@ -68,7 +69,9 @@ export default class Main extends React.Component {
 		return (
 			<Grid fluid={true}>
 				<Row className="show-grid">
-					{this.renderVerticals()}
+					<ReactCSSTransitionGroup transitionName="example" transitionEnterTimeout={500} transitionLeaveTimeout={300}>
+						{this.renderVerticals()}
+					</ReactCSSTransitionGroup>
 					{this.renderFormNewVertical()}
 				</Row>
 			</Grid>
